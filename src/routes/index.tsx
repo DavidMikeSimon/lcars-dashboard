@@ -1,6 +1,8 @@
 import { component$ } from "@builder.io/qwik";
 import type { DocumentHead } from "@builder.io/qwik-city";
 
+import inlineStyle from "../stylus/index.styl?inline";
+
 export default component$(() => {
   return (
     <>
@@ -21,5 +23,10 @@ export const head: DocumentHead = {
       name: "description",
       content: "Qwik site description",
     },
+  ],
+  styles: [
+    {
+      style: inlineStyle
+    }
   ],
 };
