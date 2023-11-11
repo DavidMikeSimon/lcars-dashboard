@@ -1,4 +1,9 @@
-import { Slot, component$ } from "@builder.io/qwik";
+import {
+  CSSProperties,
+  HTMLAttributes,
+  Slot,
+  component$,
+} from "@builder.io/qwik";
 import type { DocumentHead } from "@builder.io/qwik-city";
 
 const COLORS = {
@@ -73,19 +78,19 @@ const InnerCorner = component$<InnerCornerProps>((props) => {
   const cutoutPositionStyle = {
     top:
       corner == Corner.BottomLeft || corner == Corner.BottomRight
-        ? `-${size}px`
+        ? `-${size}rem`
         : undefined,
     bottom:
       corner == Corner.TopLeft || corner == Corner.TopRight
-        ? `-${size}px`
+        ? `-${size}rem`
         : undefined,
     left:
       corner == Corner.TopRight || corner == Corner.BottomRight
-        ? `-${size}px`
+        ? `-${size}rem`
         : undefined,
     right:
       corner == Corner.TopLeft || corner == Corner.BottomLeft
-        ? `-${size}px`
+        ? `-${size}rem`
         : undefined,
   };
 
@@ -94,8 +99,8 @@ const InnerCorner = component$<InnerCornerProps>((props) => {
       style={{
         position: "absolute",
         backgroundColor: color,
-        width: `${size}px`,
-        height: `${size}px`,
+        width: `${size}rem`,
+        height: `${size}rem`,
         overflow: "hidden",
         ...outerPositionStyle,
       }}
@@ -104,9 +109,9 @@ const InnerCorner = component$<InnerCornerProps>((props) => {
         style={{
           position: "absolute",
           backgroundColor: "black",
-          borderRadius: `${size * 2}px`,
-          width: `${size * 2}px`,
-          height: `${size * 2}px`,
+          borderRadius: `${size * 2}rem`,
+          width: `${size * 2}rem`,
+          height: `${size * 2}rem`,
           ...cutoutPositionStyle,
         }}
       />
@@ -123,87 +128,101 @@ interface LcarsBoxProps {
   color?: string;
   topEdge?: number;
   topCapped?: boolean;
-  sideEdge?: number;
-  side?: Side;
   bottomEdge?: number;
   bottomCapped?: boolean;
+  sideEdge?: number;
+  side?: Side;
   innerCornerSize?: number;
+  internalMargin?: number;
+  style?: CSSProperties;
 }
 
 const LcarsBox = component$<LcarsBoxProps>((props) => {
   const {
     color = COLORS.golden_tanoi,
     topEdge,
-    topCapped,
+    topCapped = false,
     sideEdge,
     side = Side.Left,
     bottomEdge,
-    bottomCapped,
-    innerCornerSize = 16,
+    bottomCapped = false,
+    innerCornerSize = 0.5,
+    internalMargin = 0.5,
+    style = {},
   } = props;
 
   const topEdgeComponentStyle = topEdge
     ? {
         backgroundColor: color,
-        height: `${topEdge}px`,
+        height: `${topEdge}rem`,
         borderTopLeftRadius:
-          side == Side.Right && topCapped ? `${topEdge / 2}px` : undefined,
+          side == Side.Right && topCapped ? `${topEdge / 2}rem` : undefined,
         borderTopRightRadius:
-          side == Side.Left && topCapped ? `${topEdge / 2}px` : undefined,
+          side == Side.Left && topCapped ? `${topEdge / 2}rem` : undefined,
         borderBottomLeftRadius:
-          side == Side.Right && topCapped ? `${topEdge / 2}px` : undefined,
+          side == Side.Right && topCapped ? `${topEdge / 2}rem` : undefined,
         borderBottomRightRadius:
-          side == Side.Left && topCapped ? `${topEdge / 2}px` : undefined,
+          side == Side.Left && topCapped ? `${topEdge / 2}rem` : undefined,
       }
     : {};
 
   const bottomEdgeComponentStyle = bottomEdge
     ? {
         backgroundColor: color,
-        height: `${bottomEdge}px`,
+        height: `${bottomEdge}rem`,
         borderTopLeftRadius:
           side == Side.Right && bottomCapped
-            ? `${bottomEdge / 2}px`
+            ? `${bottomEdge / 2}rem`
             : undefined,
         borderTopRightRadius:
-          side == Side.Left && bottomCapped ? `${bottomEdge / 2}px` : undefined,
+          side == Side.Left && bottomCapped
+            ? `${bottomEdge / 2}rem`
+            : undefined,
         borderBottomLeftRadius:
           side == Side.Right && bottomCapped
-            ? `${bottomEdge / 2}px`
+            ? `${bottomEdge / 2}rem`
             : undefined,
         borderBottomRightRadius:
-          side == Side.Left && bottomCapped ? `${bottomEdge / 2}px` : undefined,
+          side == Side.Left && bottomCapped
+            ? `${bottomEdge / 2}rem`
+            : undefined,
       }
     : {};
 
   return (
-    <div style={{ display: "flex", flexDirection: "column" }}>
+    <div style={{ ...style, display: "flex", flexDirection: "column" }}>
       {topEdge && (!sideEdge || topEdge > sideEdge) && (
         <div
           style={{
             ...topEdgeComponentStyle,
             borderTopLeftRadius:
               side == Side.Left
-                ? `${topEdge}px`
+                ? `${topEdge}rem`
                 : topEdgeComponentStyle.borderTopLeftRadius,
             borderTopRightRadius:
               side == Side.Right
-                ? `${topEdge}px`
+                ? `${topEdge}rem`
                 : topEdgeComponentStyle.borderTopRightRadius,
           }}
         />
       )}
-      <div style={{ display: "flex", flexDirection: "row" }}>
+      <div style={{ display: "flex", flexDirection: "row", flex: "1 1" }}>
         {sideEdge && side == Side.Left && (
           <div
             style={{
               backgroundColor: color,
-              width: `${sideEdge}px`,
+              width: `${sideEdge}rem`,
               borderTopLeftRadius:
-                topEdge && sideEdge >= topEdge ? `${topEdge}px` : undefined,
+                topEdge && sideEdge >= topEdge
+                  ? `${topEdge}rem`
+                  : topCapped && !topEdge
+                  ? `${sideEdge / 2}rem`
+                  : undefined,
               borderBottomLeftRadius:
                 bottomEdge && sideEdge >= bottomEdge
-                  ? `${bottomEdge}px`
+                  ? `${bottomEdge}rem`
+                  : bottomCapped && !bottomEdge
+                  ? `${sideEdge / 2}rem`
                   : undefined,
             }}
           />
@@ -212,7 +231,7 @@ const LcarsBox = component$<LcarsBoxProps>((props) => {
           {topEdge && sideEdge && sideEdge >= topEdge && (
             <div style={topEdgeComponentStyle}></div>
           )}
-          <div style={{ position: "relative" }}>
+          <div style={{ position: "relative", flex: "1 1" }}>
             {topEdge && sideEdge && (
               <InnerCorner
                 color={color}
@@ -220,7 +239,7 @@ const LcarsBox = component$<LcarsBoxProps>((props) => {
                 corner={side == Side.Left ? Corner.TopLeft : Corner.TopRight}
               />
             )}
-            <div style={{ margin: "20px" }}>
+            <div style={{ margin: `${internalMargin}rem` }}>
               <Slot />
             </div>
             {bottomEdge && sideEdge && (
@@ -241,12 +260,18 @@ const LcarsBox = component$<LcarsBoxProps>((props) => {
           <div
             style={{
               backgroundColor: color,
-              width: `${sideEdge}px`,
+              width: `${sideEdge}rem`,
               borderTopRightRadius:
-                topEdge && sideEdge >= topEdge ? `${topEdge}px` : undefined,
+                topEdge && sideEdge >= topEdge
+                  ? `${topEdge}rem`
+                  : topCapped && !topEdge
+                  ? `${sideEdge / 2}rem`
+                  : undefined,
               borderBottomRightRadius:
                 bottomEdge && sideEdge >= bottomEdge
-                  ? `${bottomEdge}px`
+                  ? `${bottomEdge}rem`
+                  : bottomCapped && !bottomEdge
+                  ? `${sideEdge / 2}rem`
                   : undefined,
             }}
           />
@@ -258,11 +283,11 @@ const LcarsBox = component$<LcarsBoxProps>((props) => {
             ...bottomEdgeComponentStyle,
             borderBottomLeftRadius:
               side == Side.Left
-                ? `${bottomEdge}px`
+                ? `${bottomEdge}rem`
                 : bottomEdgeComponentStyle.borderBottomLeftRadius,
             borderBottomRightRadius:
               side == Side.Right
-                ? `${bottomEdge}px`
+                ? `${bottomEdge}rem`
                 : bottomEdgeComponentStyle.borderBottomRightRadius,
           }}
         ></div>
@@ -273,15 +298,49 @@ const LcarsBox = component$<LcarsBoxProps>((props) => {
 
 export default component$(() => {
   return (
-    <LcarsBox
-      topEdge={40}
-      sideEdge={200}
-      bottomEdge={40}
-      topCapped
-      bottomCapped
+    <div
+      style={{
+        height: "100vh",
+        width: "100vw",
+        display: "flex",
+      }}
     >
-      Content content content.
-    </LcarsBox>
+      <LcarsBox
+        topEdge={2}
+        sideEdge={5}
+        bottomEdge={1}
+        topCapped
+        bottomCapped
+        style={{ margin: "1rem", width: "100%" }}
+      >
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-around",
+          }}
+        >
+          <LcarsBox
+            topEdge={1}
+            sideEdge={2}
+            side={Side.Right}
+            topCapped
+            bottomCapped
+          >
+            Foo foo foo
+          </LcarsBox>
+          <LcarsBox
+            topEdge={1}
+            sideEdge={2}
+            side={Side.Right}
+            topCapped
+            bottomCapped
+          >
+            Bar bar bar
+          </LcarsBox>
+        </div>
+      </LcarsBox>
+    </div>
   );
 });
 
