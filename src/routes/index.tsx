@@ -326,20 +326,26 @@ export default component$(() => {
       <LcarsBox
         topEdge={2}
         sideEdge={3}
-        bottomEdge={1.5}
+        bottomEdge={1}
         topCapped
         bottomCapped
         side={Side.Left}
         style={{ margin: "1rem", width: "100%" }}
       >
-        <div q:slot="top" class="lcars-row-container">
+        <div
+          q:slot="top"
+          class="lcars-row-container"
+          style={{ justifyContent: "flex-end" }}
+        >
           <div style={{ backgroundColor: COLORS.chestnut_rose }}>AAAA</div>
           <div style={{ backgroundColor: COLORS.danub }}>BBBB</div>
           <div style={{ backgroundColor: COLORS.dodger_blue }}>CCCC</div>
+          <div style={{ backgroundColor: "black" }}>sinclair</div>
         </div>
         <div q:slot="bottom" class="lcars-row-container">
           <div style={{ backgroundColor: COLORS.chestnut_rose }}>XXXX</div>
           <div style={{ backgroundColor: COLORS.danub }}>YYYY</div>
+          <div style={{ backgroundColor: "black" }}>sinclair</div>
           <div style={{ backgroundColor: COLORS.dodger_blue }}>ZZZZ</div>
         </div>
         <div q:slot="side" class="lcars-col-container">
