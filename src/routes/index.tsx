@@ -314,38 +314,26 @@ const LcarsBox = component$<LcarsBoxProps>((props) => {
   );
 });
 
-type SomeTimeStore = {
-  present: true;
+type TimeStore = {
   hour: number;
   minute: number;
   second: number;
 };
 
-type NoneTimeStore = {
-  present: false;
-};
-
-type MaybeTimeStore = SomeTimeStore | NoneTimeStore;
-
-function renderTime(store: MaybeTimeStore): string {
-  if (!store.present) {
-    return "00:00:00";
-  }
-
-  return [store.hour, store.minute, store.second]
-    .map((num) => num.toString().padStart(2, "0"))
+function renderTime(store?: TimeStore): string {
+  return [store?.hour, store?.minute, store?.second]
+    .map((num) => (num ?? 0).toString().padStart(2, "0"))
     .join(":");
 }
 
 const Clock = component$(() => {
-  const store = useStore<{ time: MaybeTimeStore }>({
-    time: { present: false },
+  const store = useStore<{ time?: TimeStore }>({
+    time: undefined,
   });
 
   useVisibleTask$(() => {
     const now = new Date();
     store.time = {
-      present: true,
       hour: now.getHours(),
       minute: now.getMinutes(),
       second: now.getSeconds(),
@@ -355,7 +343,7 @@ const Clock = component$(() => {
   return (
     <LcarsBox topEdge={1} sideEdge={2} side={Side.Right} topCapped bottomCapped>
       <div q:slot="content" class="clock">
-        <span style={{ visibility: store.time.present ? "visible" : "hidden" }}>
+        <span style={{ visibility: store.time ? "visible" : "hidden" }}>
           {renderTime(store.time)}
         </span>
       </div>
