@@ -1,5 +1,5 @@
 import type { CSSProperties } from "@builder.io/qwik";
-import { Slot, component$ } from "@builder.io/qwik";
+import { Slot, component$, useStore, useVisibleTask$ } from "@builder.io/qwik";
 import type { DocumentHead } from "@builder.io/qwik-city";
 
 const COLORS = {
@@ -314,6 +314,55 @@ const LcarsBox = component$<LcarsBoxProps>((props) => {
   );
 });
 
+type SomeTimeStore = {
+  present: true;
+  hour: number;
+  minute: number;
+  second: number;
+};
+
+type NoneTimeStore = {
+  present: false;
+};
+
+type MaybeTimeStore = SomeTimeStore | NoneTimeStore;
+
+function renderTime(store: MaybeTimeStore): string {
+  if (!store.present) {
+    return "00:00:00";
+  }
+
+  return [store.hour, store.minute, store.second]
+    .map((num) => num.toString().padStart(2, "0"))
+    .join(":");
+}
+
+const Clock = component$(() => {
+  const store = useStore<{ time: MaybeTimeStore }>({
+    time: { present: false },
+  });
+
+  useVisibleTask$(() => {
+    const now = new Date();
+    store.time = {
+      present: true,
+      hour: now.getHours(),
+      minute: now.getMinutes(),
+      second: now.getSeconds(),
+    };
+  });
+
+  return (
+    <LcarsBox topEdge={1} sideEdge={2} side={Side.Right} topCapped bottomCapped>
+      <div q:slot="content" class="clock">
+        <span style={{ visibility: store.time.present ? "visible" : "hidden" }}>
+          {renderTime(store.time)}
+        </span>
+      </div>
+    </LcarsBox>
+  );
+});
+
 export default component$(() => {
   return (
     <div
@@ -361,15 +410,7 @@ export default component$(() => {
             justifyContent: "space-around",
           }}
         >
-          <LcarsBox
-            topEdge={1}
-            sideEdge={2}
-            side={Side.Right}
-            topCapped
-            bottomCapped
-          >
-            <div q:slot="content">Foo foo foo</div>
-          </LcarsBox>
+          <Clock />
           <LcarsBox
             topEdge={1}
             sideEdge={2}

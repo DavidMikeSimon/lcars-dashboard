@@ -54,3 +54,7 @@ body {
     }
   }
 }
+
+.clock {
+  font-variadic-numeric: tabular-nums;
+}
