@@ -1,6 +1,6 @@
 @font-face {
-  font-family: 'lcars';
-  src: url('./font/LCARSGTJ3.woff') format('woff');
+  font-family: "lcars";
+  src: url("./font/LCARSGTJ3.woff") format("woff");
 }
 
 html {
@@ -8,7 +8,7 @@ html {
   -moz-tab-size: 4;
   -o-tab-size: 4;
   tab-size: 4;
-  font-family: 'lcars';
+  font-family: "lcars";
   font-size: 32px;
   background-color: black;
   color: white;
@@ -18,4 +18,39 @@ body {
   padding: 0;
   margin: 0;
   line-height: inherit;
+}
+
+.lcars-row-container {
+  display: flex;
+  align-items: stretch;
+  height: 100%;
+  border-collapse: collapse;
+
+  & div {
+    display: flex;
+    align-items: center;
+    padding: 0 0.5rem;
+    border-right: 0.15rem solid black;
+    &:first-child {
+      border-left: 0.15rem solid black;
+    }
+  }
+}
+
+.lcars-col-container {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  height: 100%;
+  border-collapse: collapse;
+
+  & div {
+    display: flex;
+    align-items: center;
+    padding: 0 0.5rem;
+    border-bottom: 0.15rem solid black;
+    &:first-child {
+      border-top: 0.15rem solid black;
+    }
+  }
 }

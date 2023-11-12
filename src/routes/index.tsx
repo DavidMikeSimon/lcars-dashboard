@@ -1,9 +1,5 @@
-import {
-  CSSProperties,
-  HTMLAttributes,
-  Slot,
-  component$,
-} from "@builder.io/qwik";
+import type { CSSProperties } from "@builder.io/qwik";
+import { Slot, component$ } from "@builder.io/qwik";
 import type { DocumentHead } from "@builder.io/qwik-city";
 
 const COLORS = {
@@ -151,10 +147,15 @@ const LcarsBox = component$<LcarsBoxProps>((props) => {
     style = {},
   } = props;
 
-  const topEdgeComponentStyle = topEdge
+  const topEdgeComponentStyle: CSSProperties = topEdge
     ? {
         backgroundColor: color,
         height: `${topEdge}rem`,
+        padding: `0 ${Math.max(
+          innerCornerSize,
+          sideEdge && topEdge <= sideEdge ? 0 : topEdge,
+          topCapped ? topEdge / 2 : 0
+        )}rem`,
         borderTopLeftRadius:
           side == Side.Right && topCapped ? `${topEdge / 2}rem` : undefined,
         borderTopRightRadius:
@@ -166,10 +167,15 @@ const LcarsBox = component$<LcarsBoxProps>((props) => {
       }
     : {};
 
-  const bottomEdgeComponentStyle = bottomEdge
+  const bottomEdgeComponentStyle: CSSProperties = bottomEdge
     ? {
         backgroundColor: color,
         height: `${bottomEdge}rem`,
+        padding: `0 ${Math.max(
+          innerCornerSize,
+          sideEdge && bottomEdge <= sideEdge ? 0 : bottomEdge,
+          bottomCapped ? bottomEdge / 2 : 0
+        )}rem`,
         borderTopLeftRadius:
           side == Side.Right && bottomCapped
             ? `${bottomEdge / 2}rem`
@@ -204,32 +210,60 @@ const LcarsBox = component$<LcarsBoxProps>((props) => {
                 ? `${topEdge}rem`
                 : topEdgeComponentStyle.borderTopRightRadius,
           }}
-        />
+        >
+          <Slot name="top" />
+        </div>
       )}
       <div style={{ display: "flex", flexDirection: "row", flex: "1 1" }}>
-        {sideEdge && side == Side.Left && (
+        {sideEdge && (
           <div
             style={{
               backgroundColor: color,
+              order: side == Side.Left ? 0 : 2,
+              paddingTop: `${Math.max(
+                innerCornerSize,
+                topEdge && topEdge <= sideEdge ? topEdge + innerCornerSize : 0
+              )}rem`,
+              paddingBottom: `${Math.max(
+                innerCornerSize,
+                bottomEdge && bottomEdge <= sideEdge
+                  ? bottomEdge + innerCornerSize
+                  : 0
+              )}rem`,
               width: `${sideEdge}rem`,
-              borderTopLeftRadius:
+              [side == Side.Left
+                ? "borderTopLeftRadius"
+                : "borderTopRightRadius"]:
                 topEdge && sideEdge >= topEdge
                   ? `${topEdge}rem`
                   : topCapped && !topEdge
                   ? `${sideEdge / 2}rem`
                   : undefined,
-              borderBottomLeftRadius:
+              [side == Side.Left
+                ? "borderBottomLeftRadius"
+                : "borderBottomRightRadius"]:
                 bottomEdge && sideEdge >= bottomEdge
                   ? `${bottomEdge}rem`
                   : bottomCapped && !bottomEdge
                   ? `${sideEdge / 2}rem`
                   : undefined,
             }}
-          />
+          >
+            <Slot name="side" />
+          </div>
         )}
-        <div style={{ display: "flex", flexDirection: "column", flex: "1 1" }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            flex: "1 1",
+            order: 1,
+          }}
+        >
           {topEdge && sideEdge && sideEdge >= topEdge && (
-            <div style={topEdgeComponentStyle}></div>
+            <div style={topEdgeComponentStyle}>
+              <Slot name="top" />
+            </div>
           )}
           <div style={{ position: "relative", flex: "1 1" }}>
             {topEdge && sideEdge && (
@@ -240,7 +274,7 @@ const LcarsBox = component$<LcarsBoxProps>((props) => {
               />
             )}
             <div style={{ margin: `${internalMargin}rem` }}>
-              <Slot />
+              <Slot name="content" />
             </div>
             {bottomEdge && sideEdge && (
               <InnerCorner
@@ -253,29 +287,11 @@ const LcarsBox = component$<LcarsBoxProps>((props) => {
             )}
           </div>
           {bottomEdge && sideEdge && sideEdge >= bottomEdge && (
-            <div style={bottomEdgeComponentStyle} />
+            <div style={bottomEdgeComponentStyle}>
+              <Slot name="bottom" />
+            </div>
           )}
         </div>
-        {sideEdge && side == Side.Right && (
-          <div
-            style={{
-              backgroundColor: color,
-              width: `${sideEdge}rem`,
-              borderTopRightRadius:
-                topEdge && sideEdge >= topEdge
-                  ? `${topEdge}rem`
-                  : topCapped && !topEdge
-                  ? `${sideEdge / 2}rem`
-                  : undefined,
-              borderBottomRightRadius:
-                bottomEdge && sideEdge >= bottomEdge
-                  ? `${bottomEdge}rem`
-                  : bottomCapped && !bottomEdge
-                  ? `${sideEdge / 2}rem`
-                  : undefined,
-            }}
-          />
-        )}
       </div>
       {bottomEdge && (!sideEdge || bottomEdge > sideEdge) && (
         <div
@@ -290,7 +306,9 @@ const LcarsBox = component$<LcarsBoxProps>((props) => {
                 ? `${bottomEdge}rem`
                 : bottomEdgeComponentStyle.borderBottomRightRadius,
           }}
-        ></div>
+        >
+          <Slot name="bottom" />
+        </div>
       )}
     </div>
   );
@@ -307,13 +325,30 @@ export default component$(() => {
     >
       <LcarsBox
         topEdge={2}
-        sideEdge={5}
-        bottomEdge={1}
+        sideEdge={3}
+        bottomEdge={1.5}
         topCapped
         bottomCapped
+        side={Side.Left}
         style={{ margin: "1rem", width: "100%" }}
       >
+        <div q:slot="top" class="lcars-row-container">
+          <div style={{ backgroundColor: COLORS.chestnut_rose }}>AAAA</div>
+          <div style={{ backgroundColor: COLORS.danub }}>BBBB</div>
+          <div style={{ backgroundColor: COLORS.dodger_blue }}>CCCC</div>
+        </div>
+        <div q:slot="bottom" class="lcars-row-container">
+          <div style={{ backgroundColor: COLORS.chestnut_rose }}>XXXX</div>
+          <div style={{ backgroundColor: COLORS.danub }}>YYYY</div>
+          <div style={{ backgroundColor: COLORS.dodger_blue }}>ZZZZ</div>
+        </div>
+        <div q:slot="side" class="lcars-col-container">
+          <div style={{ backgroundColor: COLORS.chestnut_rose }}>LLLL</div>
+          <div style={{ backgroundColor: COLORS.danub }}>MMMM</div>
+          <div style={{ backgroundColor: COLORS.dodger_blue }}>RRRR</div>
+        </div>
         <div
+          q:slot="content"
           style={{
             display: "flex",
             flexDirection: "row",
@@ -327,7 +362,7 @@ export default component$(() => {
             topCapped
             bottomCapped
           >
-            Foo foo foo
+            <div q:slot="content">Foo foo foo</div>
           </LcarsBox>
           <LcarsBox
             topEdge={1}
@@ -336,7 +371,7 @@ export default component$(() => {
             topCapped
             bottomCapped
           >
-            Bar bar bar
+            <div q:slot="content">Bar bar bar</div>
           </LcarsBox>
         </div>
       </LcarsBox>
