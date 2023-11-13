@@ -1,5 +1,7 @@
+import { isEqual } from "lodash";
+
 import type { CSSProperties } from "@builder.io/qwik";
-import { Slot, component$, useStore, useVisibleTask$ } from "@builder.io/qwik";
+import { Slot, component$, useSignal, useVisibleTask$ } from "@builder.io/qwik";
 import type { DocumentHead } from "@builder.io/qwik-city";
 
 // TODO Can we pull this from the CSS?
@@ -313,12 +315,12 @@ const LcarsBox = component$<LcarsBoxProps>((props) => {
   );
 });
 
-type TimeStore = {
+type ClockState = {
   hour: number;
   minute: number;
 };
 
-function timeStoreNow(): TimeStore {
+function timeStateNow(): ClockState {
   const now = new Date();
   return {
     hour: now.getHours(),
@@ -327,24 +329,21 @@ function timeStoreNow(): TimeStore {
 }
 
 const Clock = component$(() => {
-  const store = useStore<{ time: TimeStore }>({
-    time: timeStoreNow(),
-  });
+  const state = useSignal<ClockState>(timeStateNow());
 
   useVisibleTask$(({ cleanup }) => {
     const update = () => {
-      const now = new Date();
-      store.time = {
-        hour: now.getHours(),
-        minute: now.getMinutes(),
-      };
+      const now = timeStateNow();
+      if (!isEqual(state.value, now)) {
+        state.value = now;
+      }
     };
     const id = setInterval(update, 1000);
     cleanup(() => clearInterval(id));
   });
 
-  const hourStr = (store.time.hour % 12).toString().padStart(2, "0");
-  const minStr = store.time.minute.toString().padStart(2, "0");
+  const hourStr = (state.value.hour % 12).toString().padStart(2, "0");
+  const minStr = state.value.minute.toString().padStart(2, "0");
 
   return (
     <div q:slot="content" class="clock">
@@ -353,7 +352,7 @@ const Clock = component$(() => {
       <span class="divider">:</span>
       <span class="number">{minStr.charAt(0)}</span>
       <span class="number">{minStr.charAt(1)}</span>
-      <span class="am-pm">{store.time.hour < 12 ? "AM" : "PM"}</span>
+      <span class="am-pm">{state.value.hour < 12 ? "AM" : "PM"}</span>
     </div>
   );
 });
