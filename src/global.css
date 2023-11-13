@@ -1,3 +1,42 @@
+:root {
+  --gray: #223344;
+
+  --pale-canary: #ffff99;
+  --golden-tanoi: #ffcc66;
+  --neon-carrot: #ff9933;
+  --eggplant: #664466;
+  --lilac: #cc99cc;
+  --anakiwa: #99ccff;
+  --mariner: #3366cc;
+  --bahama-blue: #006699;
+  --red-alert: #ee1100;
+
+  --blue-bell: #9999cc;
+  --melrose: #9999ff;
+  --hopbush: #cc6699;
+  --chestnut-rose: #cc6666;
+  --orange-peel: #ff9966;
+  --atomic-tangerine: #ff9900;
+
+  --danub: #6688cc;
+  --indigo: #4455bb;
+  --lavender-purple: #9977aa;
+  --cosmic: #774466;
+  --red-damask: #dd6644;
+  --medium-carmine: #aa5533;
+  --bourbon: #bb6622;
+  --sandy-brown: #ee9955;
+
+  --periwinkle: #ccddff;
+  --dodger-blue: #5599ff;
+  --dodger-blue-alt: #3366ff;
+  --blue: #0011ee;
+  --navy-blue: #000088;
+  --husk: #bbaa55;
+  --rust: #bb4411;
+  --tamarillo: #882211;
+}
+
 @font-face {
   font-family: "lcars";
   src: url("./font/LCARSGTJ3.woff") format("woff");
@@ -56,5 +95,17 @@ body {
 }
 
 .clock {
-  font-variadic-numeric: tabular-nums;
+  .number {
+    display: inline-block;
+    color: var(--golden-tanoi);
+    font-size: 3rem;
+    min-width: 0.36em;
+  }
+  .divider {
+    color: var(--golden-tanoi);
+    font-size: 2rem;
+  }
+  .am-pm {
+    color: var(--golden-tanoi);
+  }
 }

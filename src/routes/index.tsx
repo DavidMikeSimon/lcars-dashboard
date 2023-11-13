@@ -2,10 +2,9 @@ import type { CSSProperties } from "@builder.io/qwik";
 import { Slot, component$, useStore, useVisibleTask$ } from "@builder.io/qwik";
 import type { DocumentHead } from "@builder.io/qwik-city";
 
+// TODO Can we pull this from the CSS?
 const COLORS = {
   gray: "#223344",
-  white: "white",
-  black: "black",
 
   pale_canary: "#FFFF99",
   golden_tanoi: "#FFCC66",
@@ -317,37 +316,45 @@ const LcarsBox = component$<LcarsBoxProps>((props) => {
 type TimeStore = {
   hour: number;
   minute: number;
-  second: number;
 };
 
-function renderTime(store?: TimeStore): string {
-  return [store?.hour, store?.minute, store?.second]
-    .map((num) => (num ?? 0).toString().padStart(2, "0"))
-    .join(":");
+function timeStoreNow(): TimeStore {
+  const now = new Date();
+  return {
+    hour: now.getHours(),
+    minute: now.getMinutes(),
+  };
 }
 
 const Clock = component$(() => {
-  const store = useStore<{ time?: TimeStore }>({
-    time: undefined,
+  const store = useStore<{ time: TimeStore }>({
+    time: timeStoreNow(),
   });
 
-  useVisibleTask$(() => {
-    const now = new Date();
-    store.time = {
-      hour: now.getHours(),
-      minute: now.getMinutes(),
-      second: now.getSeconds(),
+  useVisibleTask$(({ cleanup }) => {
+    const update = () => {
+      const now = new Date();
+      store.time = {
+        hour: now.getHours(),
+        minute: now.getMinutes(),
+      };
     };
+    const id = setInterval(update, 1000);
+    cleanup(() => clearInterval(id));
   });
+
+  const hourStr = (store.time.hour % 12).toString().padStart(2, "0");
+  const minStr = store.time.minute.toString().padStart(2, "0");
 
   return (
-    <LcarsBox topEdge={1} sideEdge={2} side={Side.Right} topCapped bottomCapped>
-      <div q:slot="content" class="clock">
-        <span style={{ visibility: store.time ? "visible" : "hidden" }}>
-          {renderTime(store.time)}
-        </span>
-      </div>
-    </LcarsBox>
+    <div q:slot="content" class="clock">
+      <span class="number">{hourStr.charAt(0)}</span>
+      <span class="number">{hourStr.charAt(1)}</span>
+      <span class="divider">:</span>
+      <span class="number">{minStr.charAt(0)}</span>
+      <span class="number">{minStr.charAt(1)}</span>
+      <span class="am-pm">{store.time.hour < 12 ? "AM" : "PM"}</span>
+    </div>
   );
 });
 
@@ -398,7 +405,6 @@ export default component$(() => {
             justifyContent: "space-around",
           }}
         >
-          <Clock />
           <LcarsBox
             topEdge={1}
             sideEdge={2}
@@ -408,6 +414,7 @@ export default component$(() => {
           >
             <div q:slot="content">Bar bar bar</div>
           </LcarsBox>
+          <Clock />
         </div>
       </LcarsBox>
     </div>
