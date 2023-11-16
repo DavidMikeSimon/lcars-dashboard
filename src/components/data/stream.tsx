@@ -8,9 +8,9 @@ import { useStore, useTask$, useVisibleTask$ } from "@builder.io/qwik";
 
 const DATA_STORE_TOPICS: Record<keyof DataStore, string> = {
   date_time: "sensor/date_time_iso/state",
-  forecast_hourly_forecast: "weather/forecast_hourly/forecast",
-  forecast_hourly_state: "weather/forecast_hourly/state",
-  forecast_hourly_temperature: "weather/forecast_hourly/temperature",
+  weather_forecast_hourly: "weather/forecast_hourly/forecast",
+  weather_condition: "weather/forecast_hourly/state",
+  weather_temperature: "weather/forecast_hourly/temperature",
 };
 
 const TOPICS_TO_DATA_STORE: { [key: string]: keyof DataStore } = invert(
@@ -21,14 +21,14 @@ const TOPICS_TO_DATA_STORE: { [key: string]: keyof DataStore } = invert(
 const DATA_STORE_DESERIALIZERS: Record<keyof DataStore, (raw: string) => any> =
   {
     date_time: (val) => val,
-    forecast_hourly_forecast: (val) =>
+    weather_forecast_hourly: (val) =>
       JSON.parse(val).map((item: any) => ({
         temperature: item.temperature,
         condition: item.condition,
         date_time: new Date(item.datetime),
       })),
-    forecast_hourly_state: (val) => val,
-    forecast_hourly_temperature: (val) => parseInt(val),
+    weather_condition: (val) => val,
+    weather_temperature: (val) => parseInt(val),
   };
 
 interface MessageEvent {

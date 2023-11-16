@@ -6,6 +6,7 @@ import { LcarsBracket } from "~/components/lcars/bracket";
 import { COLORS } from "~/components/lcars/colors";
 import { Side } from "~/components/lcars/types";
 import { Timeline } from "./timeline";
+import { WeatherConditionIcon } from "./weather-condition-icon";
 
 export const Dashboard = component$(() => {
   const data = useStreamedDataStore();
@@ -59,6 +60,7 @@ export const Dashboard = component$(() => {
               justifyContent: "space-around",
             }}
           >
+            <Clock dateTime={data.date_time} />
             <LcarsBracket
               topEdge={1}
               sideEdge={2}
@@ -74,15 +76,15 @@ export const Dashboard = component$(() => {
                 <div style={{ backgroundColor: "black" }}>WEBSTER</div>
               </div>
               <div q:slot="content">
-                Cond: {data.forecast_hourly_state}
+                Cond:{" "}
+                <WeatherConditionIcon condition={data.weather_condition} />
                 <br />
-                Temp: {data.forecast_hourly_temperature}
+                Temp: {data.weather_temperature}
               </div>
             </LcarsBracket>
-            <Clock dateTime={data.date_time} />
           </div>
           <div>
-            <Timeline forecasts={data.forecast_hourly_forecast} />
+            <Timeline forecasts={data.weather_forecast_hourly} />
           </div>
         </div>
       </LcarsBracket>

@@ -1,12 +1,29 @@
+export type WeatherCondition =
+  | "clear-night"
+  | "cloudy"
+  | "fog"
+  | "hail"
+  | "lightning"
+  | "lightning-rainy"
+  | "partlycloudy"
+  | "pouring"
+  | "rainy"
+  | "snowy"
+  | "snowy-rainy"
+  | "sunny"
+  | "windy"
+  | "windy-variant"
+  | "exceptional";
+
 export interface HourlyWeatherForecast {
   temperature: number;
-  condition: string;
+  condition: WeatherCondition;
   date_time: Date;
 }
 
 export interface DataStore {
   date_time: string;
-  forecast_hourly_forecast: HourlyWeatherForecast[];
-  forecast_hourly_state: string;
-  forecast_hourly_temperature: string;
+  weather_forecast_hourly: HourlyWeatherForecast[];
+  weather_condition: WeatherCondition;
+  weather_temperature: string;
 }
