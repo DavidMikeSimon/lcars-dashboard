@@ -116,4 +116,9 @@ body {
     border: 0;
     border-radius: 0.5rem;
   }
+
+  .vis-rolling-mode-btn::before {
+    position: relative;
+    top: 2px;
+  }
 }
