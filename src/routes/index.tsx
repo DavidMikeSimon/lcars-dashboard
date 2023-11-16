@@ -2,8 +2,8 @@ import type { CSSProperties } from "@builder.io/qwik";
 import {
   Slot,
   component$,
-  useComputed$,
   useStore,
+  useTask$,
   useVisibleTask$,
 } from "@builder.io/qwik";
 import { server$, type DocumentHead } from "@builder.io/qwik-city";
@@ -129,7 +129,7 @@ enum Side {
   Right = "Right",
 }
 
-interface LcarsBoxProps {
+interface LcarsBracketProps {
   color?: string;
   topEdge?: number;
   topCapped?: boolean;
@@ -142,7 +142,7 @@ interface LcarsBoxProps {
   style?: CSSProperties;
 }
 
-const LcarsBox = component$<LcarsBoxProps>((props) => {
+const LcarsBracket = component$<LcarsBracketProps>((props) => {
   const {
     color = COLORS.golden_tanoi,
     topEdge,
@@ -324,7 +324,7 @@ const LcarsBox = component$<LcarsBoxProps>((props) => {
 });
 
 interface ClockProps {
-  dateTime?: string;
+  dateTime: string;
 }
 
 const ISO_PATTERN =
@@ -333,57 +333,51 @@ const ISO_PATTERN =
 const Clock = component$<ClockProps>((props) => {
   const { dateTime } = props;
 
-  const state = useComputed$(() => {
-    const invisibleResult = {
-      visible: false,
-      numHour: 0,
-      hour: "00",
-      minute: "00",
-    };
+  const match = ISO_PATTERN.exec(dateTime);
+  if (!match?.groups) {
+    throw new Error(`Invalid match on ISO_PATTERN for dateTime '${dateTime}'`);
+  }
 
-    if (!dateTime) {
-      return invisibleResult;
-    }
-
-    const match = ISO_PATTERN.exec(dateTime);
-    if (!match?.groups) {
-      return invisibleResult;
-    }
-
-    const numHour = parseInt(match.groups.hour);
-    const hour = (numHour % 12).toString().padStart(2, "0");
-    const minute = match.groups.minute.padStart(2, "0");
-    return { visible: true, numHour, hour, minute };
-  });
+  const numHour = parseInt(match.groups.hour);
+  const hour = (numHour % 12).toString().padStart(2, "0");
+  const minute = match.groups.minute.padStart(2, "0");
 
   return (
-    <div
-      class="clock"
-      style={{ visibility: state.value.visible ? "visible" : "hidden" }}
-    >
-      <span class="number">{state.value.hour.charAt(0)}</span>
-      <span class="number">{state.value.hour.charAt(1)}</span>
+    <div class="clock">
+      <span class="number">{hour.charAt(0)}</span>
+      <span class="number">{hour.charAt(1)}</span>
       <span class="divider">:</span>
-      <span class="number">{state.value.minute.charAt(0)}</span>
-      <span class="number">{state.value.minute.charAt(1)}</span>
-      <span class="am-pm">{state.value.numHour < 12 ? "AM" : "PM"}</span>
+      <span class="number">{minute.charAt(0)}</span>
+      <span class="number">{minute.charAt(1)}</span>
+      <span class="am-pm">{numHour < 12 ? "AM" : "PM"}</span>
     </div>
   );
 });
 
 type DataStore = {
-  date_time?: string;
+  date_time: string;
+  forecast_hourly_forecast: string;
+  forecast_hourly_state: string;
+  forecast_hourly_temperature: string;
 };
 
 const DATA_STORE_TOPICS: Record<keyof DataStore, string> = {
   date_time: "sensor/date_time_iso/state",
+  forecast_hourly_forecast: "weather/forecast_hourly/forecast",
+  forecast_hourly_state: "weather/forecast_hourly/state",
+  forecast_hourly_temperature: "weather/forecast_hourly/temperature",
 };
 
 const TOPICS_TO_DATA_STORE: { [key: string]: keyof DataStore } = invert(
   DATA_STORE_TOPICS
 ) as { [key: string]: keyof DataStore };
 
-export const mqttStream = server$(async function* () {
+interface MessageEvent {
+  topic: string;
+  content: Buffer;
+}
+
+export const mqttStream = server$(async function* (withRetained: boolean) {
   const url = this.env.get("MQTT_URL");
   if (!url) {
     throw new Error("Missing env var MQTT_URL");
@@ -396,21 +390,37 @@ export const mqttStream = server$(async function* () {
     password,
   });
 
+  const messageQueue: MessageEvent[] = [];
+  connection.on("message", (topic, content) => {
+    messageQueue.push({ topic, content });
+  });
+
   try {
-    for (const value of Object.values(DATA_STORE_TOPICS)) {
-      await connection.subscribeAsync(`homeassistant_statestream/${value}`);
-    }
+    const fullTopicNames = Object.values(DATA_STORE_TOPICS).map(
+      (t) => `homeassistant_statestream/${t}`
+    );
+    await connection.subscribeAsync(fullTopicNames, {
+      qos: 0,
+      // TODO: This doesn't seem to be doing anything, client is still getting repeats of retained messages
+      rh: withRetained ? 1 : 0,
+    });
 
     while (true) {
-      const event = await once(connection, "message");
-      const topic: string = event[0];
-      const message: Buffer = event[1];
-      const shortTopic = topic.replace("homeassistant_statestream/", "");
+      while (messageQueue.length > 0) {
+        const event = messageQueue.shift()!;
+        const shortTopic = event.topic.replace(
+          "homeassistant_statestream/",
+          ""
+        );
 
-      yield {
-        key: TOPICS_TO_DATA_STORE[shortTopic],
-        message: message.toString(),
-      };
+        yield {
+          key: TOPICS_TO_DATA_STORE[shortTopic],
+          content: event.content.toString(),
+        };
+      }
+
+      // TODO: Do we need some sort of heartbeat message?
+      await once(connection, "message");
     }
   } catch (err) {
     console.log("######## Error in mqttStream");
@@ -422,14 +432,32 @@ export const mqttStream = server$(async function* () {
 });
 
 export default component$(() => {
-  const data = useStore<DataStore>({});
+  // TODO: Typing sin, we should be able to prove (or at least more explicitly
+  // assert) that DataStore is fully populated after the useTask is done.
+  const data = useStore<DataStore>({} as DataStore, { deep: false });
 
+  // TODO: Some kind of timeout?
+  useTask$(async () => {
+    const unseenTopics = new Set(Object.keys(DATA_STORE_TOPICS));
+    const mqtt = await mqttStream(true);
+    for await (const msg of mqtt) {
+      data[msg.key] = msg.content;
+      if (unseenTopics.has(msg.key)) {
+        unseenTopics.delete(msg.key);
+      }
+      if (unseenTopics.size == 0) {
+        return;
+      }
+    }
+  });
+
+  // TODO: What happens if this disconnects?
   useVisibleTask$(
     async () => {
-      const mqtt = await mqttStream();
+      const mqtt = await mqttStream(false);
       for await (const msg of mqtt) {
-        data[msg.key] = msg.message;
-        console.log("SETTING DATA", data);
+        console.log("UPDATE", msg.key);
+        data[msg.key] = msg.content;
       }
     },
     { strategy: "document-ready" }
@@ -443,7 +471,7 @@ export default component$(() => {
         display: "flex",
       }}
     >
-      <LcarsBox
+      <LcarsBracket
         topEdge={2}
         sideEdge={3}
         bottomEdge={1}
@@ -481,18 +509,29 @@ export default component$(() => {
             justifyContent: "space-around",
           }}
         >
-          <LcarsBox
+          <LcarsBracket
             topEdge={1}
             sideEdge={2}
             side={Side.Right}
             topCapped
             bottomCapped
           >
-            <div q:slot="content">{data.date_time}</div>
-          </LcarsBox>
+            <div
+              q:slot="top"
+              class="lcars-row-container"
+              style={{ justifyContent: "flex-end" }}
+            >
+              <div style={{ backgroundColor: "black" }}>WEBSTER</div>
+            </div>
+            <div q:slot="content">
+              cond: {data.forecast_hourly_state}
+              <br />
+              Temp: {data.forecast_hourly_temperature}
+            </div>
+          </LcarsBracket>
           <Clock dateTime={data.date_time} />
         </div>
-      </LcarsBox>
+      </LcarsBracket>
     </div>
   );
 });

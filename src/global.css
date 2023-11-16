@@ -106,6 +106,7 @@ body {
     font-size: 2rem;
   }
   .am-pm {
+    padding-left: 0.1em;
     color: var(--golden-tanoi);
   }
 }
