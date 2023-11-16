@@ -32,9 +32,12 @@ export const Timeline = component$<TimelineProps>((props) => {
     if (visTimeline.value !== undefined) {
       visTimeline.value.destroy();
     }
-
     visTimeline.value = noSerialize(
-      new VisTimeline(document.getElementById(id)!, items, {})
+      new VisTimeline(document.getElementById(id)!, items, {
+        rollingMode: { follow: true, offset: 0.1 },
+        height: "15rem",
+        selectable: false,
+      })
     );
   });
 
