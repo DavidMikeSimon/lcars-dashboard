@@ -327,20 +327,11 @@ interface ClockProps {
   dateTime: string;
 }
 
-const ISO_PATTERN =
-  /(?<year>\d+)-(?<month>\d+)-(?<day>\d+)T(?<hour>\d+):(?<minute>\d+):(?<second>\d+)/;
-
 const Clock = component$<ClockProps>((props) => {
   const { dateTime } = props;
-
-  const match = ISO_PATTERN.exec(dateTime);
-  if (!match?.groups) {
-    throw new Error(`Invalid match on ISO_PATTERN for dateTime '${dateTime}'`);
-  }
-
-  const numHour = parseInt(match.groups.hour);
-  const hour = (numHour % 12).toString().padStart(2, "0");
-  const minute = match.groups.minute.padStart(2, "0");
+  const now = new Date(dateTime);
+  const hour = (now.getHours() % 12).toString().padStart(2, "0");
+  const minute = now.getMinutes().toString().padStart(2, "0");
 
   return (
     <div class="clock">
@@ -349,7 +340,7 @@ const Clock = component$<ClockProps>((props) => {
       <span class="divider">:</span>
       <span class="number">{minute.charAt(0)}</span>
       <span class="number">{minute.charAt(1)}</span>
-      <span class="am-pm">{numHour < 12 ? "AM" : "PM"}</span>
+      <span class="am-pm">{now.getHours() < 12 ? "AM" : "PM"}</span>
     </div>
   );
 });
