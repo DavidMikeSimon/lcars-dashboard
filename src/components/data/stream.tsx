@@ -22,7 +22,7 @@ interface MessageEvent {
   content: Buffer;
 }
 
-export const mqttStream = server$(async function* (withRetained: boolean) {
+const mqttStream = server$(async function* (withRetained: boolean) {
   const url = this.env.get("MQTT_URL");
   if (!url) {
     throw new Error("Missing env var MQTT_URL");
