@@ -5,6 +5,7 @@ import { useStreamedDataStore } from "~/components/data/stream";
 import { LcarsBracket } from "~/components/lcars/bracket";
 import { COLORS } from "~/components/lcars/colors";
 import { Side } from "~/components/lcars/types";
+import { Timeline } from "./timeline";
 
 export const Dashboard = component$(() => {
   const data = useStreamedDataStore();
@@ -49,33 +50,40 @@ export const Dashboard = component$(() => {
         </div>
         <div
           q:slot="content"
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-around",
-          }}
+          style={{ display: "flex", flexDirection: "column", gap: "2rem" }}
         >
-          <LcarsBracket
-            topEdge={1}
-            sideEdge={2}
-            side={Side.Right}
-            topCapped
-            bottomCapped
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-around",
+            }}
           >
-            <div
-              q:slot="top"
-              class="lcars-row-container"
-              style={{ justifyContent: "flex-end" }}
+            <LcarsBracket
+              topEdge={1}
+              sideEdge={2}
+              side={Side.Right}
+              topCapped
+              bottomCapped
             >
-              <div style={{ backgroundColor: "black" }}>WEBSTER</div>
-            </div>
-            <div q:slot="content">
-              Cond: {data.forecast_hourly_state}
-              <br />
-              Temp: {data.forecast_hourly_temperature}
-            </div>
-          </LcarsBracket>
-          <Clock dateTime={data.date_time} />
+              <div
+                q:slot="top"
+                class="lcars-row-container"
+                style={{ justifyContent: "flex-end" }}
+              >
+                <div style={{ backgroundColor: "black" }}>WEBSTER</div>
+              </div>
+              <div q:slot="content">
+                Cond: {data.forecast_hourly_state}
+                <br />
+                Temp: {data.forecast_hourly_temperature}
+              </div>
+            </LcarsBracket>
+            <Clock dateTime={data.date_time} />
+          </div>
+          <div>
+            <Timeline forecasts={data.forecast_hourly_forecast} />
+          </div>
         </div>
       </LcarsBracket>
     </div>

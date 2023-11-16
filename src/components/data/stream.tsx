@@ -17,6 +17,20 @@ const TOPICS_TO_DATA_STORE: { [key: string]: keyof DataStore } = invert(
   DATA_STORE_TOPICS
 ) as { [key: string]: keyof DataStore };
 
+// TODO: Can we enforce that the deserializer returns the right type?
+const DATA_STORE_DESERIALIZERS: Record<keyof DataStore, (raw: string) => any> =
+  {
+    date_time: (val) => val,
+    forecast_hourly_forecast: (val) =>
+      JSON.parse(val).map((item: any) => ({
+        temperature: item.temperature,
+        condition: item.condition,
+        date_time: new Date(item.datetime),
+      })),
+    forecast_hourly_state: (val) => val,
+    forecast_hourly_temperature: (val) => parseInt(val),
+  };
+
 interface MessageEvent {
   topic: string;
   content: Buffer;
@@ -57,10 +71,13 @@ const mqttStream = server$(async function* (withRetained: boolean) {
           "homeassistant_statestream/",
           ""
         );
+        const dataStoreKey = TOPICS_TO_DATA_STORE[shortTopic];
 
         yield {
-          key: TOPICS_TO_DATA_STORE[shortTopic],
-          content: event.content.toString(),
+          key: dataStoreKey,
+          content: DATA_STORE_DESERIALIZERS[dataStoreKey](
+            event.content.toString()
+          ),
         };
       }
 
@@ -103,7 +120,7 @@ export const useStreamedDataStore = (): DataStore => {
     async () => {
       const mqtt = await mqttStream(false);
       for await (const msg of mqtt) {
-        console.log("UPDATE", msg.key);
+        console.log("UPDATE", msg.key, msg.content);
         data[msg.key] = msg.content;
       }
     },

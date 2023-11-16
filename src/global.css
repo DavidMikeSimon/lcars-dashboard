@@ -110,3 +110,10 @@ body {
     color: var(--golden-tanoi);
   }
 }
+
+.timeline {
+  .vis-item.vis-box {
+    border: 0;
+    border-radius: 0.5rem;
+  }
+}
