@@ -20,7 +20,7 @@ interface TimelineProps {
   forecasts: HourlyWeatherForecast[];
 }
 
-const VISIBLE_TIME_SPAN_HOURS = 16;
+const VISIBLE_TIME_SPAN_HOURS = 14;
 const ROLLING_OFFSET = 0.1;
 
 const FORECASTS_GROUP = "forecasts";
@@ -62,8 +62,10 @@ export const Timeline = component$<TimelineProps>((props) => {
     );
     visTimeline.value = noSerialize(
       new VisTimeline(document.getElementById(id)!, items, groups, {
-        //rollingMode: { follow: true, offset: ROLLING_OFFSET },
-        height: "15rem",
+        // TODO: Would be nice to have more control over the rolling update interval.
+        // See https://github.com/visjs/vis-timeline/blob/e43179e85ef5ce19667abbfbd6d5d507dbe6e405/lib/timeline/Range.js#L121
+        rollingMode: { follow: true, offset: ROLLING_OFFSET },
+        height: "12rem",
         selectable: false,
         zoomable: false,
         start: start.toDate(),

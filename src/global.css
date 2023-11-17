@@ -48,7 +48,7 @@ html {
   -o-tab-size: 4;
   tab-size: 4;
   font-family: "lcars";
-  font-size: 32px;
+  font-size: 40px;
   background-color: black;
   color: white;
 }
@@ -95,25 +95,27 @@ body {
 }
 
 .clock {
+  color: var(--golden-tanoi);
+
   .number {
     display: inline-block;
-    color: var(--golden-tanoi);
-    font-size: 3rem;
+    font-size: 4rem;
     min-width: 0.36em;
   }
   .divider {
-    color: var(--golden-tanoi);
-    font-size: 2rem;
+    font-size: 3rem;
   }
   .am-pm {
+    font-size: 1.5rem;
     padding-left: 0.1em;
-    color: var(--golden-tanoi);
   }
 }
 
 .timeline {
-  .vis-item.vis-box {
-    border: 0;
+  .vis-time-axis {
+    .vis-text {
+      color: var(--melrose);
+    }
   }
 
   .vis-rolling-mode-btn {
@@ -130,6 +132,7 @@ body {
 
   .vis-group.forecasts {
     .vis-box {
+      border: 0;
       background-color: black;
       padding-bottom: 0.5rem;
       width: 2.5rem;

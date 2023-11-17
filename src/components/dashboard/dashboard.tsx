@@ -27,31 +27,37 @@ export const Dashboard = component$(() => {
         bottomCapped
         side={Side.Left}
         style={{ margin: "1rem", width: "100%" }}
+        color={COLORS.lavender_purple}
       >
         <div
           q:slot="top"
           class="lcars-row-container"
           style={{ justifyContent: "flex-end" }}
         >
-          <div style={{ backgroundColor: COLORS.chestnut_rose }}>AAAA</div>
+          {/* <div style={{ backgroundColor: COLORS.chestnut_rose }}>AAAA</div>
           <div style={{ backgroundColor: COLORS.danub }}>BBBB</div>
-          <div style={{ backgroundColor: COLORS.dodger_blue }}>CCCC</div>
+          <div style={{ backgroundColor: COLORS.dodger_blue }}>CCCC</div> */}
           <div style={{ backgroundColor: "black" }}>sinclair</div>
         </div>
         <div q:slot="bottom" class="lcars-row-container">
-          <div style={{ backgroundColor: COLORS.chestnut_rose }}>XXXX</div>
-          <div style={{ backgroundColor: COLORS.danub }}>YYYY</div>
+          {/* <div style={{ backgroundColor: COLORS.chestnut_rose }}>XXXX</div>
+          <div style={{ backgroundColor: COLORS.danub }}>YYYY</div> */}
           <div style={{ backgroundColor: "black" }}>sinclair</div>
-          <div style={{ backgroundColor: COLORS.dodger_blue }}>ZZZZ</div>
+          {/* <div style={{ backgroundColor: COLORS.dodger_blue }}>ZZZZ</div> */}
         </div>
         <div q:slot="side" class="lcars-col-container">
-          <div style={{ backgroundColor: COLORS.chestnut_rose }}>LLLL</div>
+          {/* <div style={{ backgroundColor: COLORS.chestnut_rose }}>LLLL</div>
           <div style={{ backgroundColor: COLORS.danub }}>MMMM</div>
-          <div style={{ backgroundColor: COLORS.dodger_blue }}>RRRR</div>
+          <div style={{ backgroundColor: COLORS.dodger_blue }}>RRRR</div> */}
         </div>
         <div
           q:slot="content"
-          style={{ display: "flex", flexDirection: "column", gap: "2rem" }}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "2rem",
+            margin: "1rem",
+          }}
         >
           <div
             style={{
@@ -68,6 +74,7 @@ export const Dashboard = component$(() => {
               topCapped
               bottomCapped
               style={{ flex: "0 1 10rem" }}
+              color={COLORS.danub}
             >
               <div
                 q:slot="top"
