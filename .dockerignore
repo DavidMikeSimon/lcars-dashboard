@@ -1,0 +1,13 @@
+dist
+lib
+lib-types
+server
+tmp
+
+node_modules
+
+.git
+.env.local
+.env
+
+.vscode
