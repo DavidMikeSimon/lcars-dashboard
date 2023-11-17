@@ -1,6 +1,6 @@
 import { component$ } from "@builder.io/qwik";
 import { WeatherConditionIcon } from "./weather-condition-icon";
-import { HourlyWeatherForecast } from "../data/types";
+import type { HourlyWeatherForecast } from "../data/types";
 
 interface HourlyForecastSmallProps {
   forecast: HourlyWeatherForecast;

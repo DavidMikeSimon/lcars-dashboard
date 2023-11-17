@@ -1,6 +1,6 @@
 import { server$ } from "@builder.io/qwik-city";
 import { once } from "events";
-import { delay, invert, isEqual, isObject } from "lodash";
+import _ from "lodash";
 
 import mqtt from "mqtt";
 import type { DataStore } from "./types";
@@ -13,7 +13,7 @@ const DATA_STORE_TOPICS: Record<keyof DataStore, string> = {
   weather_temperature: "weather/forecast_hourly/temperature",
 };
 
-const TOPICS_TO_DATA_STORE: { [key: string]: keyof DataStore } = invert(
+const TOPICS_TO_DATA_STORE: { [key: string]: keyof DataStore } = _.invert(
   DATA_STORE_TOPICS
 ) as { [key: string]: keyof DataStore };
 
@@ -84,7 +84,7 @@ const mqttStream = server$(async function* (withRetained: boolean) {
       await once(connection, "message");
     }
   } catch (err) {
-    if (isObject(err) && (err as any)["code"] === "ECONNRESET") {
+    if (_.isObject(err) && (err as any)["code"] === "ECONNRESET") {
       console.log("Client disconnect: connection reset");
     } else {
       console.log("######## Error in mqttStream");
@@ -125,14 +125,14 @@ export const useStreamedDataStore = (): DataStore => {
           const mqtt = await mqttStream(false);
           for await (const msg of mqtt) {
             console.log("UPDATE", msg.key, msg.content);
-            if (!isEqual(data[msg.key], msg.content)) {
+            if (!_.isEqual(data[msg.key], msg.content)) {
               data[msg.key] = msg.content;
             }
           }
         } catch (err) {
           console.log("Disconnected from stream");
           console.log(err);
-          await new Promise((resolve) => delay(resolve, 5000));
+          await new Promise((resolve) => _.delay(resolve, 5000));
           console.log("Reconnecting...");
         }
       }
