@@ -6,7 +6,8 @@ WORKDIR /app
 COPY package.json package-lock.json /app
 RUN npm install
 
-COPY adapters dist postcss.config.js public server src tsconfig.json vite.config.ts /app
+COPY adapters postcss.config.js public src tsconfig.json vite.config.ts /app
 RUN npm run build
+COPY dist server /app
 
 CMD ["npm", "run", "serve"]
