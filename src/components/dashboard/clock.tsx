@@ -7,7 +7,10 @@ interface ClockProps {
 export const Clock = component$<ClockProps>((props) => {
   const { dateTime } = props;
   const now = new Date(dateTime);
-  const hour = (now.getHours() % 12).toString().padStart(2, "0");
+  let hour = (now.getHours() % 12).toString().padStart(2, "0");
+  if (hour == "00") {
+    hour = "12";
+  }
   const minute = now.getMinutes().toString().padStart(2, "0");
 
   return (
