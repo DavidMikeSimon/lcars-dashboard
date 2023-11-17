@@ -1,6 +1,6 @@
 import { server$ } from "@builder.io/qwik-city";
 import { once } from "events";
-import { invert } from "lodash";
+import { delay, invert, isEqual, isObject } from "lodash";
 
 import mqtt from "mqtt";
 import type { DataStore } from "./types";
@@ -81,13 +81,16 @@ const mqttStream = server$(async function* (withRetained: boolean) {
         };
       }
 
-      // TODO: Do we need some sort of heartbeat message?
       await once(connection, "message");
     }
   } catch (err) {
-    console.log("######## Error in mqttStream");
-    console.trace(err);
-    console.log("########");
+    if (isObject(err) && (err as any)["code"] === "ECONNRESET") {
+      console.log("Client disconnect: connection reset");
+    } else {
+      console.log("######## Error in mqttStream");
+      console.trace(err);
+      console.log("########");
+    }
   } finally {
     await connection.endAsync();
   }
@@ -115,13 +118,23 @@ export const useStreamedDataStore = (): DataStore => {
   });
 
   // Client-side updates
-  // TODO: What happens if this disconnects?
   useVisibleTask$(
     async () => {
-      const mqtt = await mqttStream(false);
-      for await (const msg of mqtt) {
-        console.log("UPDATE", msg.key, msg.content);
-        data[msg.key] = msg.content;
+      while (true) {
+        try {
+          const mqtt = await mqttStream(false);
+          for await (const msg of mqtt) {
+            console.log("UPDATE", msg.key, msg.content);
+            if (!isEqual(data[msg.key], msg.content)) {
+              data[msg.key] = msg.content;
+            }
+          }
+        } catch (err) {
+          console.log("Disconnected from stream");
+          console.log(err);
+          await new Promise((resolve) => delay(resolve, 5000));
+          console.log("Reconnecting...");
+        }
       }
     },
     { strategy: "document-ready" }

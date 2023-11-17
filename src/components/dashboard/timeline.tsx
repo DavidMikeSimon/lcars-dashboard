@@ -1,24 +1,29 @@
+import type { NoSerialize } from "@builder.io/qwik";
 import {
-  NoSerialize,
   component$,
   noSerialize,
+  render,
   useId,
   useSignal,
   useVisibleTask$,
 } from "@builder.io/qwik";
 
+import type { DataItem } from "vis-timeline";
 import { Timeline as VisTimeline } from "vis-timeline";
 import "vis-timeline/dist/vis-timeline-graph2d.min.css";
 import moment from "moment";
 
-import { HourlyWeatherForecast } from "../data/types";
+import type { HourlyWeatherForecast } from "../data/types";
+import { HourlyForecastSmall } from "./hourly-forecast-small";
 
 interface TimelineProps {
   forecasts: HourlyWeatherForecast[];
 }
 
-const VISIBLE_TIME_SPAN_HOURS = 12;
+const VISIBLE_TIME_SPAN_HOURS = 16;
 const ROLLING_OFFSET = 0.1;
+
+const FORECASTS_GROUP = "forecasts";
 
 export const Timeline = component$<TimelineProps>((props) => {
   const visTimeline = useSignal<NoSerialize<VisTimeline>>();
@@ -27,11 +32,20 @@ export const Timeline = component$<TimelineProps>((props) => {
 
   useVisibleTask$(({ track }) => {
     track(() => forecasts);
-    const items = forecasts.map((f) => ({
+    const groups = [
+      {
+        id: FORECASTS_GROUP,
+        content: "",
+        className: "forecasts",
+      },
+    ];
+
+    const items: DataItem[] = forecasts.map((f) => ({
       id: f.date_time.valueOf(),
-      content: f.condition,
+      content: f,
       start: f.date_time,
-    }));
+      group: FORECASTS_GROUP,
+    })) as unknown as DataItem[];
 
     if (visTimeline.value !== undefined) {
       visTimeline.value.destroy();
@@ -47,9 +61,9 @@ export const Timeline = component$<TimelineProps>((props) => {
       "hours"
     );
     visTimeline.value = noSerialize(
-      new VisTimeline(document.getElementById(id)!, items, {
-        rollingMode: { follow: true, offset: ROLLING_OFFSET },
-        height: "10rem",
+      new VisTimeline(document.getElementById(id)!, items, groups, {
+        //rollingMode: { follow: true, offset: ROLLING_OFFSET },
+        height: "15rem",
         selectable: false,
         zoomable: false,
         start: start.toDate(),
@@ -57,6 +71,11 @@ export const Timeline = component$<TimelineProps>((props) => {
         timeAxis: { scale: "hour", step: 1 },
         format: {
           minorLabels: (date) => moment(date).format("ha"),
+        },
+        template: (item, elem) => {
+          const forecast = item.content as HourlyWeatherForecast;
+          render(elem, <HourlyForecastSmall forecast={forecast} />);
+          return "";
         },
       })
     );

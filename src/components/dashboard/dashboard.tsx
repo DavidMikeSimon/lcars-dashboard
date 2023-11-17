@@ -67,19 +67,20 @@ export const Dashboard = component$(() => {
               side={Side.Right}
               topCapped
               bottomCapped
+              style={{ flex: "0 1 10rem" }}
             >
               <div
                 q:slot="top"
                 class="lcars-row-container"
                 style={{ justifyContent: "flex-end" }}
               >
-                <div style={{ backgroundColor: "black" }}>WEBSTER</div>
+                <div style={{ backgroundColor: "black" }}>Current Status</div>
               </div>
               <div q:slot="content">
                 Cond:{" "}
                 <WeatherConditionIcon condition={data.weather_condition} />
                 <br />
-                Temp: {data.weather_temperature}
+                Temp: {data.weather_temperature}&deg;
               </div>
             </LcarsBracket>
           </div>
