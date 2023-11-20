@@ -37,12 +37,14 @@ export const Dashboard = component$(() => {
           {/* <div style={{ backgroundColor: COLORS.chestnut_rose }}>AAAA</div>
           <div style={{ backgroundColor: COLORS.danub }}>BBBB</div>
           <div style={{ backgroundColor: COLORS.dodger_blue }}>CCCC</div> */}
-          <div style={{ backgroundColor: "black" }}>sinclair</div>
+          <div style={{ backgroundColor: "black", fontSize: "2rem" }}>
+            Sinclair
+          </div>
         </div>
         <div q:slot="bottom" class="lcars-row-container">
           {/* <div style={{ backgroundColor: COLORS.chestnut_rose }}>XXXX</div>
           <div style={{ backgroundColor: COLORS.danub }}>YYYY</div> */}
-          <div style={{ backgroundColor: "black" }}>sinclair</div>
+          <div style={{ backgroundColor: "black" }}>STS: CONN</div>
           {/* <div style={{ backgroundColor: COLORS.dodger_blue }}>ZZZZ</div> */}
         </div>
         <div q:slot="side" class="lcars-col-container">
@@ -50,22 +52,8 @@ export const Dashboard = component$(() => {
           <div style={{ backgroundColor: COLORS.danub }}>MMMM</div>
           <div style={{ backgroundColor: COLORS.dodger_blue }}>RRRR</div> */}
         </div>
-        <div
-          q:slot="content"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "2rem",
-            margin: "1rem",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "space-around",
-            }}
-          >
+        <div q:slot="content" class="dashboard-main">
+          <div class="dashboard-row">
             <Clock dateTime={data.date_time} />
             <LcarsBracket
               topEdge={1}
@@ -73,7 +61,6 @@ export const Dashboard = component$(() => {
               side={Side.Right}
               topCapped
               bottomCapped
-              style={{ flex: "0 1 10rem" }}
               color={COLORS.danub}
             >
               <div
@@ -81,13 +68,33 @@ export const Dashboard = component$(() => {
                 class="lcars-row-container"
                 style={{ justifyContent: "flex-end" }}
               >
-                <div style={{ backgroundColor: "black" }}>Current Status</div>
+                <div style={{ backgroundColor: "black" }}>Wthr</div>
               </div>
               <div q:slot="content">
                 Cond:{" "}
                 <WeatherConditionIcon condition={data.weather_condition} />
                 <br />
                 Temp: {data.weather_temperature}&deg;
+              </div>
+            </LcarsBracket>
+            <LcarsBracket
+              topEdge={1}
+              sideEdge={2}
+              side={Side.Right}
+              topCapped
+              bottomCapped
+              color={COLORS.bourbon}
+            >
+              <div
+                q:slot="top"
+                class="lcars-row-container"
+                style={{ justifyContent: "flex-end" }}
+              >
+                <div style={{ backgroundColor: "black" }}>Tsks</div>
+              </div>
+              <div q:slot="content">
+                NORM: 3<br />
+                WARN: 5
               </div>
             </LcarsBracket>
           </div>

@@ -48,7 +48,7 @@ html {
   -o-tab-size: 4;
   tab-size: 4;
   font-family: "lcars";
-  font-size: 20px;
+  font-size: 28px;
   background-color: black;
   color: white;
 }
@@ -57,6 +57,19 @@ body {
   padding: 0;
   margin: 0;
   line-height: inherit;
+}
+
+.dashboard-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 1rem;
+}
+
+.dashboard-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
 }
 
 .lcars-row-container {
@@ -99,7 +112,8 @@ body {
 
   .number {
     display: inline-block;
-    font-size: 4rem;
+    font-size: 5rem;
+    line-height: 5rem;
     min-width: 0.36em;
   }
   .divider {
@@ -133,10 +147,9 @@ body {
   .vis-group.forecasts {
     .vis-box {
       border: 0;
-      background-color: black;
-      padding-bottom: 0.5rem;
-      width: 2.5rem;
+      background-color: transparent;
       height: 2rem;
+      padding-left: 0.2rem;
     }
 
     .vis-dot {
@@ -153,8 +166,9 @@ body {
   color: white;
   display: flex;
   flex-direction: column;
+  align-items: center;
 
   .temp {
-    padding-left: 0.32rem;
+    padding-left: 0.25rem;
   }
 }

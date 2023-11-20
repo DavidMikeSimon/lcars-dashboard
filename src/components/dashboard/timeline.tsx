@@ -65,7 +65,7 @@ export const Timeline = component$<TimelineProps>((props) => {
         // TODO: Would be nice to have more control over the rolling update interval.
         // See https://github.com/visjs/vis-timeline/blob/e43179e85ef5ce19667abbfbd6d5d507dbe6e405/lib/timeline/Range.js#L121
         rollingMode: { follow: true, offset: ROLLING_OFFSET },
-        height: "12rem",
+        height: "9rem",
         selectable: false,
         zoomable: false,
         start: start.toDate(),
