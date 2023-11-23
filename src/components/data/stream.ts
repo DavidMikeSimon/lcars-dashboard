@@ -4,7 +4,13 @@ import _ from "lodash";
 
 import mqtt from "mqtt";
 import type { DataStore } from "./types";
-import { useStore, useTask$, useVisibleTask$ } from "@builder.io/qwik";
+import {
+  useSignal,
+  useStore,
+  useTask$,
+  useVisibleTask$,
+} from "@builder.io/qwik";
+import { getDeploymentTimestamp } from "./deployment";
 
 const DATA_STORE_TOPICS: Record<keyof DataStore, string> = {
   date_time: "sensor/date_time_iso/state",
@@ -97,6 +103,8 @@ const mqttStream = server$(async function* (withRetained: boolean) {
 });
 
 export const useStreamedDataStore = (): DataStore => {
+  const startupTimestamp = useSignal<number | null>(null);
+
   // TODO: Typing sin, we should be able to prove (or at least more explicitly
   // assert) that DataStore is fully populated after the useTask is done.
   const data = useStore<DataStore>({} as DataStore, { deep: false });
@@ -106,6 +114,7 @@ export const useStreamedDataStore = (): DataStore => {
   useTask$(async () => {
     const unseenTopics = new Set(Object.keys(DATA_STORE_TOPICS));
     const mqtt = await mqttStream(true);
+    startupTimestamp.value = await getDeploymentTimestamp();
     for await (const msg of mqtt) {
       data[msg.key] = msg.content;
       if (unseenTopics.has(msg.key)) {
@@ -122,6 +131,15 @@ export const useStreamedDataStore = (): DataStore => {
     async () => {
       while (true) {
         try {
+          const newTimestampValue = await getDeploymentTimestamp();
+          if (
+            startupTimestamp.value &&
+            startupTimestamp.value != newTimestampValue
+          ) {
+            console.log("Going to refresh...");
+            await new Promise((resolve) => _.delay(resolve, 3000));
+            location.reload();
+          }
           const mqtt = await mqttStream(false);
           for await (const msg of mqtt) {
             console.log("UPDATE", msg.key, msg.content);
