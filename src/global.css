@@ -134,7 +134,7 @@ body {
   overscroll-behavior-x: none;
   overflow-y: hidden;
   position: relative;
-  height: 7rem;
+  height: 8rem;
 
   .hours {
     position: absolute;

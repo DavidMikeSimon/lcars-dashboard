@@ -1,4 +1,4 @@
-import { component$ } from "@builder.io/qwik";
+import { component$, useSignal, useVisibleTask$ } from "@builder.io/qwik";
 
 import _ from "lodash";
 import { DateTime } from "luxon";
@@ -16,6 +16,7 @@ const TIME_ZONE = "America/New_York";
 
 export const Timeline = component$<TimelineProps>((props) => {
   const { dateTime, forecasts } = props;
+  const timelineElem = useSignal<Element>();
 
   const now = DateTime.fromISO(dateTime, { zone: TIME_ZONE });
   const start = now.startOf("day");
@@ -27,8 +28,19 @@ export const Timeline = component$<TimelineProps>((props) => {
     ])
   );
 
+  useVisibleTask$(({ track }) => {
+    track(() => dateTime);
+    if (timelineElem.value) {
+      const pixels =
+        (nowHours - 2) *
+        HOUR_WIDTH_REM *
+        parseFloat(getComputedStyle(document.documentElement).fontSize);
+      timelineElem.value.scrollTo(pixels, 0);
+    }
+  });
+
   return (
-    <div class="timeline">
+    <div class="timeline" ref={timelineElem}>
       <div class="hours">
         {_.range(0, 24).map((hour) => {
           const forecast = forecastsByHour[

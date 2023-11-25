@@ -70,7 +70,7 @@ export const Dashboard = component$(() => {
               >
                 <div style={{ backgroundColor: "black" }}>Wthr</div>
               </div>
-              <div q:slot="content">
+              <div q:slot="content" style={{ fontSize: "1.5rem" }}>
                 Cond:{" "}
                 <WeatherConditionIcon condition={data.weather_condition} />
                 <br />
