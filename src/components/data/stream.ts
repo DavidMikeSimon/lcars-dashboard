@@ -137,7 +137,7 @@ export const useStreamedDataStore = (): DataStore => {
             startupTimestamp.value != newTimestampValue
           ) {
             console.log("Going to refresh...");
-            await new Promise((resolve) => _.delay(resolve, 3000));
+            await new Promise((resolve) => _.delay(resolve, 10000));
             location.reload();
           }
           const mqtt = await mqttStream(false);
