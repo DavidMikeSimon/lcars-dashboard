@@ -1,87 +1,57 @@
-import type { NoSerialize } from "@builder.io/qwik";
-import {
-  component$,
-  noSerialize,
-  render,
-  useId,
-  useSignal,
-  useVisibleTask$,
-} from "@builder.io/qwik";
+import { component$ } from "@builder.io/qwik";
 
-import type { DataItem } from "vis-timeline";
-import { Timeline as VisTimeline } from "vis-timeline";
-import "vis-timeline/dist/vis-timeline-graph2d.min.css";
-import moment from "moment";
+import _ from "lodash";
+import { DateTime } from "luxon";
 
 import type { HourlyWeatherForecast } from "../data/types";
 import { HourlyForecastSmall } from "./hourly-forecast-small";
 
 interface TimelineProps {
+  dateTime: string;
   forecasts: HourlyWeatherForecast[];
 }
 
-const VISIBLE_TIME_SPAN_HOURS = 14;
-const ROLLING_OFFSET = 0.1;
-
-const FORECASTS_GROUP = "forecasts";
+const HOUR_WIDTH_REM = 2.5;
+const TIME_ZONE = "America/New_York";
 
 export const Timeline = component$<TimelineProps>((props) => {
-  const visTimeline = useSignal<NoSerialize<VisTimeline>>();
-  const id = useId();
-  const { forecasts } = props;
+  const { dateTime, forecasts } = props;
 
-  useVisibleTask$(({ track }) => {
-    track(() => forecasts);
-    const groups = [
-      {
-        id: FORECASTS_GROUP,
-        content: "",
-        className: "forecasts",
-      },
-    ];
+  const now = DateTime.fromISO(dateTime, { zone: TIME_ZONE });
+  const start = now.startOf("day");
+  const nowHours = now.diff(start, "hours").as("hours");
+  const forecastsByHour: { [key: number]: HourlyWeatherForecast } = _.fromPairs(
+    forecasts.map((forecast) => [
+      DateTime.fromJSDate(forecast.date_time).diff(start).as("hours"),
+      forecast,
+    ])
+  );
 
-    const items: DataItem[] = forecasts.map((f) => ({
-      id: f.date_time.valueOf(),
-      content: f,
-      start: f.date_time,
-      group: FORECASTS_GROUP,
-    })) as unknown as DataItem[];
-
-    if (visTimeline.value !== undefined) {
-      visTimeline.value.destroy();
-    }
-
-    const now = moment();
-    const start = moment(now).subtract(
-      VISIBLE_TIME_SPAN_HOURS * ROLLING_OFFSET,
-      "hours"
-    );
-    const end = moment(now).add(
-      VISIBLE_TIME_SPAN_HOURS * (1.0 - ROLLING_OFFSET),
-      "hours"
-    );
-    visTimeline.value = noSerialize(
-      new VisTimeline(document.getElementById(id)!, items, groups, {
-        // TODO: Would be nice to have more control over the rolling update interval.
-        // See https://github.com/visjs/vis-timeline/blob/e43179e85ef5ce19667abbfbd6d5d507dbe6e405/lib/timeline/Range.js#L121
-        rollingMode: { follow: true, offset: ROLLING_OFFSET },
-        height: "9rem",
-        selectable: false,
-        zoomable: false,
-        start: start.toDate(),
-        end: end.toDate(),
-        timeAxis: { scale: "hour", step: 1 },
-        format: {
-          minorLabels: (date) => moment(date).format("ha"),
-        },
-        template: (item, elem) => {
-          const forecast = item.content as HourlyWeatherForecast;
-          render(elem, <HourlyForecastSmall forecast={forecast} />);
-          return "";
-        },
-      })
-    );
-  });
-
-  return <div class="timeline" id={id} />;
+  return (
+    <div class="timeline">
+      <div class="hours">
+        {_.range(0, 24).map((hour) => {
+          const forecast = forecastsByHour[
+            hour
+          ] as HourlyWeatherForecast | null;
+          const t = start.plus({ hours: hour });
+          return (
+            <div class="hour-column" key={hour}>
+              <div class="forecast">
+                {forecast && <HourlyForecastSmall forecast={forecast} />}
+              </div>
+              <div class="column-label">
+                <span class="hour">{t.toFormat("h")}</span>
+                <span class="am-pm">{t.toFormat("a").charAt(0)}</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <div
+        class="now-line"
+        style={{ left: `${nowHours * HOUR_WIDTH_REM}rem` }}
+      />
+    </div>
+  );
 });

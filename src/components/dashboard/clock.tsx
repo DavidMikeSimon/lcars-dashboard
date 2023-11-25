@@ -1,4 +1,5 @@
 import { component$ } from "@builder.io/qwik";
+import { DateTime } from "luxon";
 
 interface ClockProps {
   dateTime: string;
@@ -6,12 +7,10 @@ interface ClockProps {
 
 export const Clock = component$<ClockProps>((props) => {
   const { dateTime } = props;
-  const now = new Date(dateTime);
-  let hour = (now.getHours() % 12).toString().padStart(2, "0");
-  if (hour == "00") {
-    hour = "12";
-  }
-  const minute = now.getMinutes().toString().padStart(2, "0");
+  const now = DateTime.fromISO(dateTime);
+  const hour = now.toFormat("hh");
+  const minute = now.toFormat("mm");
+  const amPm = now.toFormat("a");
 
   return (
     <div class="clock">
@@ -20,7 +19,7 @@ export const Clock = component$<ClockProps>((props) => {
       <span class="divider">:</span>
       <span class="number">{minute.charAt(0)}</span>
       <span class="number">{minute.charAt(1)}</span>
-      <span class="am-pm">{now.getHours() < 12 ? "AM" : "PM"}</span>
+      <span class="am-pm">{amPm}</span>
     </div>
   );
 });

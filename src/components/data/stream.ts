@@ -1,16 +1,16 @@
 import { server$ } from "@builder.io/qwik-city";
-import { once } from "events";
-import _ from "lodash";
-
-import mqtt from "mqtt";
-import type { DataStore } from "./types";
 import {
   useSignal,
   useStore,
   useTask$,
   useVisibleTask$,
 } from "@builder.io/qwik";
+import { once } from "events";
+import _ from "lodash";
+import mqtt from "mqtt";
+
 import { getDeploymentTimestamp } from "./deployment";
+import type { DataStore } from "./types";
 
 const DATA_STORE_TOPICS: Record<keyof DataStore, string> = {
   date_time: "sensor/date_time_iso/state",

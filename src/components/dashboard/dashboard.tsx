@@ -99,7 +99,10 @@ export const Dashboard = component$(() => {
             </LcarsBracket>
           </div>
           <div>
-            <Timeline forecasts={data.weather_forecast_hourly} />
+            <Timeline
+              dateTime={data.date_time}
+              forecasts={data.weather_forecast_hourly}
+            />
           </div>
         </div>
       </LcarsBracket>

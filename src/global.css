@@ -35,6 +35,8 @@
   --husk: #bbaa55;
   --rust: #bb4411;
   --tamarillo: #882211;
+
+  --hour-width: 2.5rem;
 }
 
 @font-face {
@@ -48,7 +50,7 @@ html {
   -o-tab-size: 4;
   tab-size: 4;
   font-family: "lcars";
-  font-size: 28px;
+  font-size: 36px;
   background-color: black;
   color: white;
 }
@@ -126,39 +128,55 @@ body {
 }
 
 .timeline {
-  .vis-time-axis {
-    .vis-text {
-      color: var(--melrose);
+  border: 1px solid white;
+  width: 100%;
+  overflow-x: scroll;
+  overscroll-behavior-x: none;
+  overflow-y: hidden;
+  position: relative;
+  height: 7rem;
+
+  .hours {
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+
+    .hour-column {
+      width: var(--hour-width);
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid white;
+      align-items: center;
+      justify-content: flex-end;
+
+      &:last-child {
+        border-right: none;
+      }
+
+      .forecast {
+        flex: 0 0 3rem;
+        padding-top: 0.25rem;
+      }
+
+      .column-label {
+        flex: 0 0 2rem;
+        .hour {
+          font-size: 1.5rem;
+          margin-right: 0.1rem;
+        }
+        .am-pm {
+          color: var(--bourbon);
+        }
+      }
     }
   }
 
-  .vis-rolling-mode-btn {
-    width: auto;
-    padding: 0.3rem 0.5rem 0.1rem;
-    border-radius: 0.25rem;
-    font-weight: 100;
-    opacity: 1;
-    background-color: var(--lavender-purple);
-    &::before {
-      content: "RST";
-    }
-  }
-
-  .vis-group.forecasts {
-    .vis-box {
-      border: 0;
-      background-color: transparent;
-      height: 2rem;
-      padding-left: 0.2rem;
-    }
-
-    .vis-dot {
-      display: none;
-    }
-
-    .vis-line {
-      display: none;
-    }
+  .now-line {
+    position: absolute;
+    height: 100%;
+    top: 0;
+    border: 0.05rem solid var(--golden-tanoi);
   }
 }
 
