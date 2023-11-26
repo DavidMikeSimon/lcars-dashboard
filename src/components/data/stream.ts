@@ -10,7 +10,8 @@ import _ from "lodash";
 import mqtt from "mqtt";
 
 import { getDeploymentTimestamp } from "./deployment";
-import type { DataStore } from "./types";
+import { DataStore, StreamStatus } from "./types";
+import { Stream } from "stream";
 
 const DATA_STORE_TOPICS: Record<keyof DataStore, string> = {
   date_time: "sensor/date_time_iso/state",
@@ -102,12 +103,19 @@ const mqttStream = server$(async function* (withRetained: boolean) {
   }
 });
 
-export const useStreamedDataStore = (): DataStore => {
+interface UseStreamedDataStoreResult {
+  data: DataStore;
+  status: StreamStatus;
+}
+
+export const useStreamedDataStore = (): UseStreamedDataStoreResult => {
   const startupTimestamp = useSignal<number | null>(null);
 
   // TODO: Typing sin, we should be able to prove (or at least more explicitly
   // assert) that DataStore is fully populated after the useTask is done.
   const data = useStore<DataStore>({} as DataStore, { deep: false });
+
+  const status = useSignal<StreamStatus>(StreamStatus.INIT);
 
   // Server-side initialization
   // TODO: Some kind of timeout?
@@ -136,27 +144,25 @@ export const useStreamedDataStore = (): DataStore => {
             startupTimestamp.value &&
             startupTimestamp.value != newTimestampValue
           ) {
-            console.log("Going to refresh...");
+            status.value = StreamStatus.REFRESHING;
             await new Promise((resolve) => _.delay(resolve, 10000));
             location.reload();
           }
           const mqtt = await mqttStream(false);
+          status.value = StreamStatus.CONNECTED;
           for await (const msg of mqtt) {
-            console.log("UPDATE", msg.key, msg.content);
             if (!_.isEqual(data[msg.key], msg.content)) {
               data[msg.key] = msg.content;
             }
           }
         } catch (err) {
-          console.log("Disconnected from stream");
-          console.log(err);
+          status.value = StreamStatus.DISCONNECTED;
           await new Promise((resolve) => _.delay(resolve, 5000));
-          console.log("Reconnecting...");
         }
       }
     },
     { strategy: "document-ready" }
   );
 
-  return data;
+  return { data, status: status.value };
 };

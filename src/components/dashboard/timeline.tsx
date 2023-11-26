@@ -29,7 +29,7 @@ export const Timeline = component$<TimelineProps>((props) => {
   );
 
   useVisibleTask$(({ track }) => {
-    track(() => dateTime);
+    track(() => props.dateTime);
     if (timelineElem.value) {
       const pixels =
         (nowHours - 2) *

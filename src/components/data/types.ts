@@ -27,3 +27,10 @@ export interface DataStore {
   weather_condition: WeatherCondition;
   weather_temperature: string;
 }
+
+export enum StreamStatus {
+  INIT = "init",
+  CONNECTED = "connected",
+  DISCONNECTED = "disconnected",
+  REFRESHING = "refreshing",
+}
