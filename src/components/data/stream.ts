@@ -10,8 +10,8 @@ import _ from "lodash";
 import mqtt from "mqtt";
 
 import { getDeploymentTimestamp } from "./deployment";
-import { DataStore, StreamStatus } from "./types";
-import { Stream } from "stream";
+import type { DataStore } from "./types";
+import { StreamStatus } from "./types";
 
 const DATA_STORE_TOPICS: Record<keyof DataStore, string> = {
   date_time: "sensor/date_time_iso/state",
