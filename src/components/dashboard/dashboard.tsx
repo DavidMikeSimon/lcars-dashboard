@@ -9,7 +9,7 @@ export const Dashboard = component$(() => {
   const { data } = useContext(StreamedDataStoreContext);
 
   return (
-    <>
+    <div class="dashboard-main">
       <div class="dashboard-row">
         <Clock dateTime={data.date_time} />
         <div style={{ fontSize: "1.5rem" }}>
@@ -25,6 +25,6 @@ export const Dashboard = component$(() => {
           workCalendar={data.calendar_color}
         />
       </div>
-    </>
+    </div>
   );
 });

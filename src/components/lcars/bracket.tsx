@@ -149,7 +149,13 @@ export const LcarsBracket = component$<LcarsBracketProps>((props) => {
               <Slot name="top" />
             </div>
           )}
-          <div style={{ position: "relative", flex: "1 1" }}>
+          <div
+            style={{
+              position: "relative",
+              flex: "1 1",
+              display: "flex",
+            }}
+          >
             {topEdge && sideEdge && (
               <InnerCorner
                 color={color}
@@ -157,7 +163,13 @@ export const LcarsBracket = component$<LcarsBracketProps>((props) => {
                 corner={side == Side.Left ? Corner.TopLeft : Corner.TopRight}
               />
             )}
-            <div style={{ margin: `${internalMargin}rem` }}>
+            <div
+              style={{
+                margin: `${internalMargin}rem`,
+                flex: "1 1",
+                display: "flex",
+              }}
+            >
               <Slot name="content" />
             </div>
             {bottomEdge && sideEdge && (

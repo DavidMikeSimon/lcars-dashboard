@@ -49,6 +49,7 @@ export default component$(() => {
         side={Side.Left}
         style={{ margin: "1rem", width: "100%" }}
         color={COLORS.lavender_purple}
+        internalMargin={0.5}
       >
         <div
           q:slot="top"
@@ -72,7 +73,7 @@ export default component$(() => {
             NC
           </Link>
         </div>
-        <div q:slot="content" class="dashboard-main">
+        <div q:slot="content" style={{ flex: "1 1 100%" }}>
           <Slot />
         </div>
       </LcarsBracket>
