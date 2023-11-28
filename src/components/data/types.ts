@@ -21,8 +21,16 @@ export interface HourlyWeatherForecast {
   date_time: Date;
 }
 
+export interface CalendarEvent {
+  uid: string;
+  start_time: Date;
+  end_time: Date;
+  summary: string;
+}
+
 export interface DataStore {
   date_time: string;
+  calendar_color: CalendarEvent[];
   weather_forecast_hourly: HourlyWeatherForecast[];
   weather_condition: WeatherCondition;
   weather_temperature: string;

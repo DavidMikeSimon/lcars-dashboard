@@ -75,6 +75,7 @@ export const Dashboard = component$(() => {
             <Timeline
               dateTime={data.date_time}
               forecasts={data.weather_forecast_hourly}
+              workCalendar={data.calendar_color}
             />
           </div>
         </div>

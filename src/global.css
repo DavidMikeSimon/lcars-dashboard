@@ -36,7 +36,7 @@
   --rust: #bb4411;
   --tamarillo: #882211;
 
-  --hour-width: 2.5rem;
+  --hour-width: 3.5rem;
 }
 
 @font-face {
@@ -156,7 +156,7 @@ body {
       }
 
       .forecast {
-        flex: 0 0 3rem;
+        flex: 0 0 1rem;
         padding-top: 0.25rem;
       }
 
@@ -173,6 +173,30 @@ body {
     }
   }
 
+  .events {
+    display: flex;
+    flex-direction: column;
+    .events-row {
+      margin: 0.5rem 0;
+      position: relative;
+      height: 1.5rem;
+      max-height: 1.5rem;
+      .event {
+        display: flex;
+        align-items: center;
+        position: absolute;
+        box-sizing: border-box;
+        height: 100%;
+        border-radius: 2vmin;
+        top: 0;
+        background-color: var(--danub);
+        overflow: hidden;
+        white-space: nowrap;
+        padding: 0.25rem;
+      }
+    }
+  }
+
   .now-line {
     position: absolute;
     height: 100%;
@@ -184,7 +208,7 @@ body {
 .hourly-forecast-small {
   color: white;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
 
   .temp {

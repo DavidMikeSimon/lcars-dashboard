@@ -10,14 +10,17 @@ import _ from "lodash";
 import mqtt from "mqtt";
 
 import { getDeploymentTimestamp } from "./deployment";
-import type { DataStore } from "./types";
+import type { CalendarEvent, DataStore } from "./types";
 import { StreamStatus } from "./types";
 
 const DATA_STORE_TOPICS: Record<keyof DataStore, string> = {
-  date_time: "sensor/date_time_iso/state",
-  weather_forecast_hourly: "weather/forecast_hourly/forecast",
-  weather_condition: "weather/forecast_hourly/state",
-  weather_temperature: "weather/forecast_hourly/temperature",
+  calendar_color: "mqtt-ical/david-at-color/events",
+  date_time: "homeassistant_statestream/sensor/date_time_iso/state",
+  weather_forecast_hourly:
+    "homeassistant_statestream/weather/forecast_hourly/forecast",
+  weather_condition: "homeassistant_statestream/weather/forecast_hourly/state",
+  weather_temperature:
+    "homeassistant_statestream/weather/forecast_hourly/temperature",
 };
 
 const TOPICS_TO_DATA_STORE: { [key: string]: keyof DataStore } = _.invert(
@@ -27,6 +30,28 @@ const TOPICS_TO_DATA_STORE: { [key: string]: keyof DataStore } = _.invert(
 // TODO: Can we enforce that the deserializer returns the right type?
 const DATA_STORE_DESERIALIZERS: Record<keyof DataStore, (raw: string) => any> =
   {
+    calendar_color: (val) =>
+      _.sortBy(
+        JSON.parse(val)
+          .map((raw_event: any): CalendarEvent | null => {
+            if (
+              raw_event["UID"] &&
+              raw_event["DTSTART"] &&
+              raw_event["DTEND"] &&
+              raw_event["SUMMARY"]
+            ) {
+              return {
+                uid: raw_event["UID"][0]["value"],
+                start_time: new Date(raw_event["DTSTART"][0]["value"]),
+                end_time: new Date(raw_event["DTEND"][0]["value"]),
+                summary: raw_event["SUMMARY"][0]["value"],
+              };
+            }
+            return null;
+          })
+          .filter((event: CalendarEvent | null) => event != null),
+        "start_time"
+      ),
     date_time: (val) => val,
     weather_forecast_hourly: (val) =>
       JSON.parse(val).map((item: any) => ({
@@ -62,10 +87,7 @@ const mqttStream = server$(async function* (withRetained: boolean) {
   });
 
   try {
-    const fullTopicNames = Object.values(DATA_STORE_TOPICS).map(
-      (t) => `homeassistant_statestream/${t}`
-    );
-    await connection.subscribeAsync(fullTopicNames, {
+    await connection.subscribeAsync(Object.values(DATA_STORE_TOPICS), {
       qos: 0,
       // TODO: This doesn't seem to be doing anything, client is still getting repeats of retained messages
       rh: withRetained ? 1 : 0,
@@ -74,11 +96,7 @@ const mqttStream = server$(async function* (withRetained: boolean) {
     while (true) {
       while (messageQueue.length > 0) {
         const event = messageQueue.shift()!;
-        const shortTopic = event.topic.replace(
-          "homeassistant_statestream/",
-          ""
-        );
-        const dataStoreKey = TOPICS_TO_DATA_STORE[shortTopic];
+        const dataStoreKey = TOPICS_TO_DATA_STORE[event.topic];
 
         yield {
           key: dataStoreKey,
