@@ -103,6 +103,7 @@ body {
     align-items: center;
     padding: 0 0.5rem;
     border-bottom: 0.15rem solid black;
+    font-size: 1.5rem;
     &:first-child {
       border-top: 0.15rem solid black;
     }
@@ -128,13 +129,12 @@ body {
 }
 
 .timeline {
-  border: 1px solid white;
   width: 100%;
   overflow-x: scroll;
   overscroll-behavior-x: none;
   overflow-y: hidden;
   position: relative;
-  height: 8rem;
+  height: 7rem;
 
   .hours {
     position: absolute;
