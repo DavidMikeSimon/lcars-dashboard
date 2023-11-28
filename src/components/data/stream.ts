@@ -1,5 +1,6 @@
 import { server$ } from "@builder.io/qwik-city";
 import {
+  createContextId,
   useSignal,
   useStore,
   useTask$,
@@ -184,3 +185,6 @@ export const useStreamedDataStore = (): UseStreamedDataStoreResult => {
 
   return { data, status: status.value };
 };
+
+export const StreamedDataStoreContext =
+  createContextId<UseStreamedDataStoreResult>("streamed-data-store");

@@ -1,5 +1,9 @@
-import { component$, Slot } from "@builder.io/qwik";
+import { component$, Slot, useContextProvider } from "@builder.io/qwik";
 import { Link, type RequestHandler } from "@builder.io/qwik-city";
+import {
+  StreamedDataStoreContext,
+  useStreamedDataStore,
+} from "~/components/data/stream";
 
 import { StreamStatus } from "~/components/data/types";
 import { LcarsBracket } from "~/components/lcars/bracket";
@@ -25,8 +29,8 @@ export const onGet: RequestHandler = async ({ cacheControl }) => {
 };
 
 export default component$(() => {
-  //const { data, status } = useStreamedDataStore();
-  const status = StreamStatus.CONNECTED; // FIXME: Need a shared connection context
+  const dataStoreResult = useStreamedDataStore();
+  useContextProvider(StreamedDataStoreContext, dataStoreResult);
 
   return (
     <div
@@ -57,7 +61,7 @@ export default component$(() => {
         </div>
         <div q:slot="bottom" class="lcars-row-container">
           <div style={{ backgroundColor: "black" }}>
-            STS: {STREAM_STATUS_DESC_MAP[status]}
+            STS: {STREAM_STATUS_DESC_MAP[dataStoreResult.status]}
           </div>
         </div>
         <div q:slot="side" class="lcars-col-container">

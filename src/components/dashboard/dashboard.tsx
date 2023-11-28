@@ -1,12 +1,12 @@
-import { component$ } from "@builder.io/qwik";
+import { component$, useContext } from "@builder.io/qwik";
 
 import { Clock } from "./clock";
 import { WeatherConditionIcon } from "./weather-condition-icon";
 import { Timeline } from "./timeline";
-import { useStreamedDataStore } from "../data/stream";
+import { StreamedDataStoreContext } from "../data/stream";
 
 export const Dashboard = component$(() => {
-  const { data } = useStreamedDataStore();
+  const { data } = useContext(StreamedDataStoreContext);
 
   return (
     <>
