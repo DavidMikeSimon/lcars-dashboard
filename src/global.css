@@ -61,6 +61,11 @@ body {
   line-height: inherit;
 }
 
+a {
+  text-decoration: none;
+  color: white;
+}
+
 .dashboard-main {
   display: flex;
   flex-direction: column;
@@ -80,7 +85,7 @@ body {
   height: 100%;
   border-collapse: collapse;
 
-  & div {
+  div, a {
     display: flex;
     align-items: center;
     padding: 0 0.5rem;
@@ -98,7 +103,7 @@ body {
   height: 100%;
   border-collapse: collapse;
 
-  & div {
+  div, a {
     display: flex;
     align-items: center;
     padding: 0 0.5rem;

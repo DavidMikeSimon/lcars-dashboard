@@ -1,5 +1,5 @@
 import { component$, Slot } from "@builder.io/qwik";
-import type { RequestHandler } from "@builder.io/qwik-city";
+import { Link, type RequestHandler } from "@builder.io/qwik-city";
 
 import { StreamStatus } from "~/components/data/types";
 import { LcarsBracket } from "~/components/lcars/bracket";
@@ -38,7 +38,7 @@ export default component$(() => {
     >
       <LcarsBracket
         topEdge={2}
-        sideEdge={7}
+        sideEdge={6}
         bottomEdge={1}
         topCapped
         bottomCapped
@@ -61,8 +61,12 @@ export default component$(() => {
           </div>
         </div>
         <div q:slot="side" class="lcars-col-container">
-          <div style={{ backgroundColor: COLORS.eggplant }}>STATUS</div>
-          <div style={{ backgroundColor: COLORS.eggplant }}>NC</div>
+          <Link href="/" style={{ backgroundColor: COLORS.eggplant }}>
+            MAINVIEW
+          </Link>
+          <Link href="/nextcloud" style={{ backgroundColor: COLORS.eggplant }}>
+            NC
+          </Link>
         </div>
         <div q:slot="content" class="dashboard-main">
           <Slot />
