@@ -6,6 +6,7 @@ import {
   useTask$,
   useVisibleTask$,
 } from "@builder.io/qwik";
+import timeout from "@async-generators/timeout";
 import { once } from "events";
 import _ from "lodash";
 import mqtt from "mqtt";
@@ -132,24 +133,28 @@ export const useStreamedDataStore = (): UseStreamedDataStoreResult => {
 
   // TODO: Typing sin, we should be able to prove (or at least more explicitly
   // assert) that DataStore is fully populated after the useTask is done.
-  const data = useStore<DataStore>({} as DataStore, { deep: false });
+  const data = useStore<DataStore>({}, { deep: false });
 
   const status = useSignal<StreamStatus>(StreamStatus.INIT);
 
   // Server-side initialization
-  // TODO: Some kind of timeout?
   useTask$(async () => {
     const unseenTopics = new Set(Object.keys(DATA_STORE_TOPICS));
     const mqtt = await mqttStream(true);
     startupTimestamp.value = await getDeploymentTimestamp();
-    for await (const msg of mqtt) {
-      data[msg.key] = msg.content;
-      if (unseenTopics.has(msg.key)) {
-        unseenTopics.delete(msg.key);
+    try {
+      for await (const msg of timeout(mqtt, 250)) {
+        data[msg.key] = msg.content;
+        if (unseenTopics.has(msg.key)) {
+          unseenTopics.delete(msg.key);
+        }
+        if (unseenTopics.size == 0) {
+          return;
+        }
       }
-      if (unseenTopics.size == 0) {
-        return;
-      }
+    } catch (e) {
+      console.log("Error while initializing streamed data store", e);
+      return;
     }
   });
 

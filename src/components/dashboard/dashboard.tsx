@@ -8,12 +8,17 @@ import { StreamedDataStoreContext } from "../data/stream";
 export const Dashboard = component$(() => {
   const { data } = useContext(StreamedDataStoreContext);
 
+  if (!data.date_time) {
+    return null;
+  }
+
   return (
     <div class="dashboard-main">
       <div class="dashboard-row">
         <Clock dateTime={data.date_time} />
         <div style={{ fontSize: "1.5rem" }}>
-          Cond: <WeatherConditionIcon condition={data.weather_condition} />
+          Cond:{" "}
+          <WeatherConditionIcon condition={data.weather_condition ?? "sunny"} />
           <br />
           Temp: {data.weather_temperature}&deg;
         </div>
@@ -21,8 +26,8 @@ export const Dashboard = component$(() => {
       <div>
         <Timeline
           dateTime={data.date_time}
-          forecasts={data.weather_forecast_hourly}
-          workCalendar={data.calendar_color}
+          forecasts={data.weather_forecast_hourly ?? []}
+          workCalendar={data.calendar_color ?? []}
         />
       </div>
     </div>

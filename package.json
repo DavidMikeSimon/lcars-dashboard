@@ -50,6 +50,7 @@
     "vite-tsconfig-paths": "^4.2.1"
   },
   "dependencies": {
+    "@async-generators/timeout": "^0.3.0",
     "@qwikest/icons": "^0.0.13",
     "lodash": "^4.17.21",
     "luxon": "^3.4.4",

@@ -29,11 +29,11 @@ export interface CalendarEvent {
 }
 
 export interface DataStore {
-  date_time: string;
-  calendar_color: CalendarEvent[];
-  weather_forecast_hourly: HourlyWeatherForecast[];
-  weather_condition: WeatherCondition;
-  weather_temperature: string;
+  date_time?: string;
+  calendar_color?: CalendarEvent[];
+  weather_forecast_hourly?: HourlyWeatherForecast[];
+  weather_condition?: WeatherCondition;
+  weather_temperature?: string;
 }
 
 export enum StreamStatus {
