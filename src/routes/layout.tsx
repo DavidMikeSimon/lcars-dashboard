@@ -32,6 +32,24 @@ export default component$(() => {
   const dataStoreResult = useStreamedDataStore();
   useContextProvider(StreamedDataStoreContext, dataStoreResult);
 
+  if (dataStoreResult.status !== StreamStatus.CONNECTED) {
+    return (
+      <div
+        style={{
+          height: "100vh",
+          width: "100vw",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <div style={{ fontSize: "4rem", color: "#d11" }}>
+          STATUS: {STREAM_STATUS_DESC_MAP[dataStoreResult.status]}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       style={{
@@ -58,11 +76,6 @@ export default component$(() => {
         >
           <div style={{ backgroundColor: "black", fontSize: "2rem" }}>
             Sinclair
-          </div>
-        </div>
-        <div q:slot="bottom" class="lcars-row-container">
-          <div style={{ backgroundColor: "black" }}>
-            STS: {STREAM_STATUS_DESC_MAP[dataStoreResult.status]}
           </div>
         </div>
         <div q:slot="side" class="lcars-col-container">
