@@ -19,10 +19,10 @@ const DATA_STORE_TOPICS: Record<keyof DataStore, string> = {
   calendar_color: "mqtt-ical/david-at-color/events",
   date_time: "homeassistant_statestream/sensor/date_time_iso/state",
   weather_forecast_hourly:
-    "homeassistant_statestream/weather/forecast_hourly/forecast",
-  weather_condition: "homeassistant_statestream/weather/forecast_hourly/state",
+    "homeassistant_statestream/sensor/weather_forecast_hourly/forecast",
+  weather_condition: "homeassistant_statestream/weather/forecast/state",
   weather_temperature:
-    "homeassistant_statestream/weather/forecast_hourly/temperature",
+    "homeassistant_statestream/weather/forecast/temperature",
 };
 
 const TOPICS_TO_DATA_STORE: { [key: string]: keyof DataStore } = _.invert(
